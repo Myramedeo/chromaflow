@@ -1,0 +1,21 @@
+info:
+  name: Change Status to In-Progress
+  type: http
+  seq: 8
+
+http:
+  method: PATCH
+  url: http://localhost:3000/api/workspaces/cmofdq0g80000twufluz0pd53/projects/cmog4rqyb00006oufqrh4b0ri/tasks/cmog4tf0200026ouf9v4xnck9
+  body:
+    type: json
+    data: |-
+      {
+        "status": "IN_PROGRESS"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

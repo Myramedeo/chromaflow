@@ -1,0 +1,15 @@
+info:
+  name: Task Listing
+  type: http
+  seq: 10
+
+http:
+  method: GET
+  url: http://localhost:3000/api/workspaces/cmofdq0g80000twufluz0pd53/projects/cmog4rqyb00006oufqrh4b0ri/tasks
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -1,0 +1,21 @@
+info:
+  name: Task Creation
+  type: http
+  seq: 6
+
+http:
+  method: POST
+  url: http://localhost:3000/api/workspaces/cmofdq0g80000twufluz0pd53/projects/cmog4rqyb00006oufqrh4b0ri/tasks
+  body:
+    type: json
+    data: |-
+      {
+        "title": "My Task"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

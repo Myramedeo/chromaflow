@@ -1,0 +1,26 @@
+opencollection: 1.0.0
+
+info:
+  name: Chromaflow API
+config:
+  proxy:
+    inherit: true
+    config:
+      protocol: http
+      hostname: ""
+      port: ""
+      auth:
+        username: ""
+        password: ""
+      bypassProxy: ""
+
+request:
+  auth:
+    type: bearer
+    token: eyJhbGciOiJSUzI1NiIsImNhdCI6ImNsX0I3ZDRQRDExMUFBQSIsImtpZCI6Imluc18zQ2pKVEVXWkhmdVVpY3NkcHpIYzdORk5Za2kiLCJ0eXAiOiJKV1QifQ.eyJhenAiOiJodHRwOi8vbG9jYWxob3N0OjMwMDAiLCJleHAiOjE3NzcyMzA4MDgsImZ2YSI6WzAsLTFdLCJpYXQiOjE3NzcyMzA3NDgsImlzcyI6Imh0dHBzOi8vd29ya2luZy1ibG93ZmlzaC04MC5jbGVyay5hY2NvdW50cy5kZXYiLCJuYmYiOjE3NzcyMzA3MzgsInNpZCI6InNlc3NfM0N1THZXeVpTQ0R6QjBwMWJ5d3BIN3ZzRVZuIiwic3RzIjoiYWN0aXZlIiwic3ViIjoidXNlcl8zQ3VMdlZhVnJ1SWhqb2J5aVl1SzEybjhVRjciLCJ2IjoyfQ.FYJgZfG8qp9x_Lt4dnr8rNk_HqgjsZwlMGYazDjluuJOIC6Cqi0nphr05SO0bV5Hqkzar4CdbXOaFgt7t_rKsthgHgQ74hpavpLyYGYoFA-49Qn0RkzpUX0tqBFAIRytsH2s_mQDFFmuCIE5-UIn4_k0hAe-w2Qeh_Yrdj8P-9u0O5Ra0Sz47i5Hi5igqLS0iD1g6HjCju5NmQqSpm8fU7ozUQ-iMOvLBxruTjyxK2AwxoZYzMNuj-C-h82FRZeXfhH7bte_9XFKr0fUgrTCz8YYufE3XobQgVAN9lPfB3bNr7d6_CmzT1OgtP4Ul3AQKdkdqs-ODyMil7GXUtXK1g
+bundled: false
+extensions:
+  bruno:
+    ignore:
+      - node_modules
+      - .git

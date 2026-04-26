@@ -1,0 +1,22 @@
+info:
+  name: Workspace Creation
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: http://localhost:3000/api/workspaces
+  body:
+    type: json
+    data: |-
+      {
+        "name": "My Workspace",
+        "slug": "my-workspace"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

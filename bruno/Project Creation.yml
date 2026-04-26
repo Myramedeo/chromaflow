@@ -1,0 +1,21 @@
+info:
+  name: Project Creation
+  type: http
+  seq: 4
+
+http:
+  method: POST
+  url: http://localhost:3000/api/workspaces/cmofdq0g80000twufluz0pd53/projects
+  body:
+    type: json
+    data: |-
+      {
+        "name": "My Project"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
