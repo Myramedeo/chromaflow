@@ -40,17 +40,32 @@ const buttonVariants = cva(
   }
 )
 
+type ButtonBaseProps = ButtonPrimitive.Props & VariantProps<typeof buttonVariants>
+
+type ButtonProps =
+  | ({ asChild?: false } & ButtonBaseProps)
+  | ({ asChild: true } & React.HTMLAttributes<HTMLSpanElement> & VariantProps<typeof buttonVariants>)
+
 function Button({
   className,
   variant = "default",
   size = "default",
+  asChild = false,
   ...props
-}: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
+}: ButtonProps) {
+  const classes = cn(buttonVariants({ variant, size, className }))
+
+  if (asChild) {
+    return (
+      <span data-slot="button" className={classes} {...(props as React.HTMLAttributes<HTMLSpanElement>)} />
+    )
+  }
+
   return (
     <ButtonPrimitive
       data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
-      {...props}
+      className={classes}
+      {...(props as ButtonPrimitive.Props)}
     />
   )
 }

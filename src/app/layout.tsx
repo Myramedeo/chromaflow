@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import { ClerkProvider, Show, SignInButton, SignUpButton, UserButton } from '@clerk/nextjs'
+import { Toaster } from "sonner";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 
@@ -23,15 +24,14 @@ export const metadata: Metadata = {
   description: "A collaborative project management tool built with Next.js, Prisma, and Supabase.",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  return (
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (  
     <ClerkProvider>
       <html lang="en">
-        <body className={inter.className}>{children}</body>
+        <body className={inter.className}>
+          {children}
+          <Toaster position="bottom-right" richColors />
+        </body>
       </html>
     </ClerkProvider>
   );
