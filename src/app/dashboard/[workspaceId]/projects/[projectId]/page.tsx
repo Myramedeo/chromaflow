@@ -1,10 +1,14 @@
 "use client";
 
+import { useState, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { useProjects } from "@/hooks/useProjects";
 import { KanbanBoard } from "@/components/tasks/KanbanBoard";
+import { ActiveUsers } from "@/components/tasks/ActiveUsers";
+import { ActivityFeed } from "@/components/tasks/ActivityFeed";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LayoutGrid } from "lucide-react";
+import type { PresenceUser } from "@/hooks/useRealtimeTasks";
 
 export default function ProjectPage() {
   const { workspaceId, projectId } = useParams<{
@@ -14,6 +18,11 @@ export default function ProjectPage() {
 
   const { projects, isLoading } = useProjects(workspaceId);
   const project = projects.find((p) => p.id === projectId);
+  const [activeUsers, setActiveUsers] = useState<PresenceUser[]>([]);
+
+  const handleActiveUsersChange = useCallback((users: PresenceUser[]) => {
+    setActiveUsers(users);
+  }, []);
 
   return (
     <div className="flex h-full flex-col">
@@ -35,6 +44,12 @@ export default function ProjectPage() {
                 — {project.description}
               </span>
             )}
+
+            <div className="flex-1" />
+ 
+            {/* Live viewer avatars */}
+            <ActiveUsers users={activeUsers} />
+
             <div className="ml-auto flex items-center gap-1.5 text-xs text-gray-400">
               <LayoutGrid className="h-3.5 w-3.5" />
               Kanban
@@ -44,8 +59,15 @@ export default function ProjectPage() {
       </div>
 
       {/* Board — fills remaining height, scrolls horizontally */}
-      <div className="flex-1 overflow-hidden">
-        <KanbanBoard workspaceId={workspaceId} projectId={projectId} />
+      <div className="flex flex-1 overflow-hidden">
+        <div className="flex-1 overflow-hidden">
+          <KanbanBoard 
+            workspaceId={workspaceId} 
+            projectId={projectId} 
+            onActiveUsersChange={handleActiveUsersChange}
+          />
+        </div>
+        <ActivityFeed workspaceId={workspaceId} projectId={projectId} />
       </div>
     </div>
   );

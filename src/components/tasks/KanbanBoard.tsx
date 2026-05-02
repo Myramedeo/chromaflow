@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -13,18 +13,24 @@ import {
 import { arrayMove } from "@dnd-kit/sortable";
 import { KanbanColumn } from "./KanbanColumn";
 import { TaskCard } from "./TaskCard";
-import { useTasks } from "@/hooks/useTasks";
+import { useRealtimeTasks, type PresenceUser } from "@/hooks/useRealtimeTasks";
 import { KANBAN_COLUMNS, type Task, type TaskStatus } from "@/types";
 import { toast } from "sonner";
 
 interface Props {
   workspaceId: string;
   projectId: string;
+  onActiveUsersChange?: (users: PresenceUser[]) => void;
 }
 
-export function KanbanBoard({ workspaceId, projectId }: Props) {
-  const { tasks, isLoading, createTask, updateTask } = useTasks(workspaceId, projectId);
+export function KanbanBoard({ workspaceId, projectId, onActiveUsersChange }: Props) {
+  const { tasks, isLoading, createTask, updateTask, activeUsers } = useRealtimeTasks(workspaceId, projectId);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
+
+  // Bubble presence list up to the page so the header can render <ActiveUsers />
+  useEffect(() => {
+    onActiveUsersChange?.(activeUsers);
+  }, [activeUsers, onActiveUsersChange]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })

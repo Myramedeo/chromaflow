@@ -102,7 +102,7 @@ export function TaskDetailModal({ task, open, onClose }: Props) {
   return (
     <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
       <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
-        <SheetHeader className="mb-6">
+        <SheetHeader className="mb-6 px-0">
           <SheetTitle className="sr-only">Task details</SheetTitle>
           {/* Inline editable title */}
           <textarea

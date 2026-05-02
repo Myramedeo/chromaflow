@@ -24,7 +24,7 @@ export const GET = withAuth(async (_req, { userId }) => {
     orderBy: { joinedAt: "asc" },
   });
 
-  const workspaces = memberships.map((m) => ({
+  const workspaces = memberships.map((m: typeof memberships[number]) => ({
     ...m.workspace,
     role: m.role,
   }));
