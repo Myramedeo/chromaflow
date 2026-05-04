@@ -10,6 +10,7 @@ import {
   parseBody,
 } from "@/lib/api-helpers";
 import { logActivity, ACTIONS } from "@/lib/activity";
+import { Prisma } from "@prisma/client";
 
 export const GET = withAuth(async (_req, { userId }) => {
   const memberships = await db.workspaceMember.findMany({
@@ -59,7 +60,7 @@ export const POST = withAuth(async (req, { userId }) => {
   }
 
   // Create workspace + membership in one transaction
-  const workspace = await db.$transaction(async (tx) => {
+  const workspace = await db.$transaction(async (tx: Prisma.TransactionClient) => {
     const ws = await tx.workspace.create({
       data: { name: body.name, slug: body.slug },
     });

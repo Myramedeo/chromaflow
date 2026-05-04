@@ -11,6 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { LogOut, Plus, FolderKanban, LayoutDashboard } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Settings } from "lucide-react"
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -118,6 +119,23 @@ export function Sidebar() {
           </section>
         )}
       </div>
+
+      {activeWorkspaceId && (
+        <div className="px-3 pb-3">
+          <Link
+            href={`/dashboard/${activeWorkspaceId}/settings/billing`}
+            className={cn(
+              "flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors",
+              pathname === `/dashboard/${activeWorkspaceId}/settings/billing`
+                ? "bg-gray-100 text-gray-900 font-medium"
+                : "text-gray-600 hover:bg-gray-50"
+            )}
+          >
+            <Settings className="h-4 w-4 flex-shrink-0" />
+            <span>Billing</span>
+          </Link>
+        </div>
+      )}
 
       {/* User footer */}
       <div className="border-t border-gray-200 p-3">

@@ -39,6 +39,8 @@ model Workspace {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  subscription Subscription?
+
   members  WorkspaceMember[]
   projects Project[]
 }
@@ -152,3 +154,38 @@ model ActivityLog {
   @@index([taskId])
   @@index([userId])
 }
+
+// ─────────────────────────────────────────────
+// Subscription — adds subscription tiers
+// ─────────────────────────────────────────────
+
+enum PlanTier {
+  FREE
+  PRO
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+  INCOMPLETE
+}
+
+model Subscription {
+  id                     String             @id @default(cuid())
+  workspaceId            String             @unique
+  stripeCustomerId       String             @unique
+  stripeSubscriptionId   String?            @unique
+  stripePriceId          String?
+  plan                   PlanTier           @default(FREE)
+  status                 SubscriptionStatus @default(ACTIVE)
+  currentPeriodEnd       DateTime?
+  cancelAtPeriodEnd      Boolean            @default(false)
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([stripeCustomerId])
+}
+

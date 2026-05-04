@@ -2,7 +2,7 @@
 // Call this inside any route handler that mutates data.
 
 import { db } from "@/lib/db";
-import type { InputJsonValue } from "@prisma/client/runtime/library";
+import { Prisma } from "@prisma/client";
 
 interface LogActivityParams {
   userId: string;
@@ -26,7 +26,7 @@ export async function logActivity({
         action,
         projectId: projectId ?? null,
         taskId: taskId ?? null,
-        metadata: metadata ? (metadata as InputJsonValue) : undefined,
+        metadata: metadata ? (metadata as Prisma.InputJsonValue) : undefined,
       },
     });
   } catch (err) {
