@@ -10,9 +10,13 @@ import {
   parseBody,
 } from "@/lib/api-helpers";
 import { logActivity, ACTIONS } from "@/lib/activity";
+import { syncUser } from "@/lib/sync-user";
 import { Prisma } from "@prisma/client";
 
 export const GET = withAuth(async (_req, { userId }) => {
+  // Ensure user is in sync with Clerk before fetching workspaces
+  await syncUser(userId);
+
   const memberships = await db.workspaceMember.findMany({
     where: { userId },
     include: {
