@@ -31,13 +31,16 @@ export const POST = withAuth(async (req, { userId }) => {
   // Verify customer exists in environment, if not create a new one and update the subscription record
   try {
     await stripe.customers.retrieve(customerId);
-  } catch (err: any) {
-    if (err.code === "resource_missing") {
-
-      // Customer is from wrong environment
-      
-      const customer = await stripe.customers.create({
-        metadata: { workspaceId },
+  } catch (err) {
+    if (
+      err &&
+      typeof err === "object" &&
+      "code" in err &&
+      err.code === "resource_missing"
+    ) {
+        // Customer is from wrong environment
+        const customer = await stripe.customers.create({
+          metadata: { workspaceId },
       });
 
       customerId = customer.id;

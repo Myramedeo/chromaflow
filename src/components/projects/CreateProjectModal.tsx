@@ -90,7 +90,7 @@ export function CreateProjectModal({
         {limitHit ? (
           <div className="space-y-4 pt-2">
             <div className="rounded-lg border border-indigo-100 bg-indigo-50 p-4 text-sm text-indigo-800">
-              <p className="font-medium mb-1">You've hit the free plan limit</p>
+              <p className="font-medium mb-1">You&#39;ve hit the free plan limit</p>
               <p className="text-indigo-700">
                 The free plan allows up to 3 projects. Upgrade to Pro for unlimited projects,
                 team members, and more.

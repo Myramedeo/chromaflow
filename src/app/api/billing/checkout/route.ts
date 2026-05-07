@@ -21,7 +21,7 @@ export const POST = withAuth(async (req, { userId }) => {
   if (!membership || membership.role !== "OWNER") return forbidden();
 
   // Get or create a Stripe Customer tied to this workspace
-  let subscription = await db.subscription.findUnique({ where: { workspaceId } });
+  const subscription = await db.subscription.findUnique({ where: { workspaceId } });
   let stripeCustomerId = subscription?.stripeCustomerId;
 
   if (!stripeCustomerId) {
