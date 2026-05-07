@@ -22,6 +22,11 @@ export function useRealtimeTasks(workspaceId: string, projectId: string) {
   const taskHelpers = useTasks(workspaceId, projectId);
   const { mutate } = taskHelpers;
   const { user } = useUser();
+  
+  const userId = user?.id;
+  const userName = user?.fullName ?? null;
+  const userAvatarUrl = user?.imageUrl ?? null;
+
   const [activeUsers, setActiveUsers] = useState<PresenceUser[]>([]);
 
   useEffect(() => {
@@ -40,7 +45,7 @@ export function useRealtimeTasks(workspaceId: string, projectId: string) {
     }
 
     const channel: RealtimeChannel = supabase.channel(channelName, {
-      config: { presence: { key: user?.id ?? "anonymous" } },
+      config: { presence: { key: userId ?? "anonymous" } },
     });
 
     // ── 1. Database change listener ──────────────────────────────────────────
@@ -73,12 +78,12 @@ export function useRealtimeTasks(workspaceId: string, projectId: string) {
     });
 
     channel.subscribe(async (status) => {
-      if (status === "SUBSCRIBED" && user) {
+      if (status === "SUBSCRIBED" && userId) {
         // Broadcast this user's presence to all others on the channel
         await channel.track({
-          userId: user.id,
-          name: user.fullName,
-          avatarUrl: user.imageUrl ?? null,
+          userId,
+          name: userName,
+          avatarUrl: userAvatarUrl,
         } satisfies PresenceUser);
       }
     });
@@ -88,7 +93,7 @@ export function useRealtimeTasks(workspaceId: string, projectId: string) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [projectId, user?.id, mutate]);
+  }, [projectId, userId, userName, userAvatarUrl, mutate]);
 
   return { ...taskHelpers, activeUsers };
 }

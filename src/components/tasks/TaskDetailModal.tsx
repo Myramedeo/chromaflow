@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useTasks } from "@/hooks/useTasks";
 import type { Task, TaskStatus, TaskPriority } from "@/types";
@@ -31,12 +30,6 @@ export function TaskDetailModal({ task, open, onClose }: Props) {
   // Local state mirrors the task so fields feel instant
   const [title, setTitle] = useState(task.title);
   const [description, setDescription] = useState(task.description ?? "");
-
-  // Keep local state in sync if the task changes (e.g. via drag)
-  useEffect(() => {
-    setTitle(task.title);
-    setDescription(task.description ?? "");
-  }, [task]);
 
   async function handleTitleBlur() {
     if (title.trim() === task.title) return;
@@ -100,7 +93,11 @@ export function TaskDetailModal({ task, open, onClose }: Props) {
   }
 
   return (
-    <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
+    <Sheet
+      key={task.id}
+      open={open}
+      onOpenChange={(v) => !v && onClose()}
+    >
       <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
         <SheetHeader className="mb-6 px-0">
           <SheetTitle className="sr-only">Task details</SheetTitle>
