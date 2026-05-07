@@ -1,36 +1,101 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Chromaflow
 
-## Getting Started
+A full-stack collaborative project management SaaS built with Next.js, Postgres, and Stripe.
 
-First, run the development server:
+**Live demo:** [usechromaflow.com](https://usechromaflow.com) &nbsp;·&nbsp; **Status:** Production
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+---
+
+## Features
+
+- **Kanban boards:** drag-and-drop task management (@dnd-kit)
+- **Real-time collaboration:** task moves sync instantly across all open sessions (Supabase Realtime)
+- **Live presence:** see who's viewing the same board via WebSocket presence tracking
+- **Activity feed:** live timeline of every action taken on a project
+- **Subscription billing:** free and Pro tiers with Stripe Checkout and Customer Portal
+- **Plan enforcement:** free plan gated at 3 projects; upgrades unlock unlimited usage
+- **Multi-tenant workspaces:** invite-based membership with Owner / Admin / Member roles
+- **Auth:** email and Google sign-in via Clerk
+
+## Tech stack
+
+| Layer | Technology |
+| --- | --- |
+| Frontend | Next.js 14 (App Router), TypeScript, Tailwind CSS, shadcn |
+| Backend | Next.js API Route Handlers, Prisma ORM |
+| Database | PostgreSQL via Supabase |
+| Auth | Clerk |
+| Real-time | Supabase Realtime (WebSocket + Presence) |
+| Payments | Stripe (Checkout, Webhooks, Customer Portal) |
+| Deployment | Vercel (frontend) + Supabase (database) |
+| CI | GitHub Actions (type-check + lint on PRs) |
+
+## Architecture
+
+```text
+Browser
+  ├── Next.js App Router (pages + layouts)
+  ├── SWR (data fetching + cache)
+  ├── Supabase JS client (WebSocket subscription)
+  └── Clerk (session management)
+
+Next.js API Routes
+  ├── /api/user              - sync Clerk user → Postgres
+  ├── /api/workspaces/**     - workspace + membership CRUD
+  │   └── /projects/**       - project CRUD + plan gates
+  │       └── /tasks/**      - task CRUD + activity logging
+  ├── /api/billing/**        - Stripe checkout, portal, webhook
+  └── withAuth()             - Clerk session guard on every route
+
+Postgres (Supabase)
+  ├── User, Workspace, WorkspaceMember
+  ├── Project, Task, ActivityLog
+  └── Subscription (Stripe state mirror)
+
+Supabase Realtime
+  └── WAL events on Task + ActivityLog → broadcast to channel subscribers
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Local setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# 1. Clone and install
+git clone https://github.com/YOUR_USERNAME/projectflow.git
+cd projectflow
+npm install
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# 2. Copy env template and fill in your keys
+cp .env.example .env.local
 
-## Learn More
+# 3. Push the database schema
+npx prisma migrate dev
 
-To learn more about Next.js, take a look at the following resources:
+# 4. Start the dev server
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Open [localhost:3000](http://localhost:3000).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Required services
 
-## Deploy on Vercel
+- [Clerk](https://clerk.com) for authentication
+- [Supabase](https://supabase.com) for PostgreSQL database + Realtime
+- [Stripe](https://stripe.com) for billing (test mode for local dev)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Environment variables
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See `.env.example` for all required variables and where to find them.
+
+## CI
+
+Every push and pull request runs two parallel GitHub Actions jobs.
+
+- `type-check` runs `tsc --noEmit` across the full codebase
+- `lint` runs `next lint` (ESLint + Next.js rules)
+
+## Roadmap
+
+- [ ] Email notifications (Resend) when a task is assigned
+- [ ] CSV export of project tasks
+- [ ] Keyboard shortcuts for power users
+- [ ] Public marketing landing page
