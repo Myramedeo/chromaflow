@@ -1,5 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import type { WorkspaceRole } from "@prisma/client";
  
 // ── Response helpers ──────────────────────────────────────────────────────────
  
@@ -11,8 +12,19 @@ export function created<T>(data: T) {
   return NextResponse.json(data, { status: 201 });
 }
  
-export function error(message: string, status = 400) {
-  return NextResponse.json({ error: message }, { status });
+export function error(
+  message: string,
+  status = 400,
+  options?: { code?: string; details?: unknown }
+) {
+  return NextResponse.json(
+    {
+      error: message,
+      ...(options?.code ? { code: options.code } : {}),
+      ...(options?.details !== undefined ? { details: options.details } : {}),
+    },
+    { status }
+  );
 }
  
 export function unauthorized() {
@@ -66,6 +78,13 @@ export async function getWorkspaceMembership(
     where: { userId_workspaceId: { userId, workspaceId } },
     include: { workspace: true },
   });
+}
+
+export function hasWorkspaceRole(
+  role: WorkspaceRole,
+  allowedRoles: readonly WorkspaceRole[]
+) {
+  return allowedRoles.includes(role);
 }
  
 // ── Parse JSON body safely ────────────────────────────────────────────────────

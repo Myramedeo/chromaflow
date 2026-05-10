@@ -23,6 +23,7 @@ model User {
   updatedAt DateTime @updatedAt
 
   workspaces WorkspaceMember[]
+  sentInvites WorkspaceInvitation[] @relation("WorkspaceInvitationInviter")
   assignedTasks Task[]          @relation("TaskAssignee")
   createdTasks  Task[]          @relation("TaskCreator")
   activityLogs  ActivityLog[]
@@ -42,6 +43,7 @@ model Workspace {
   subscription Subscription?
 
   members  WorkspaceMember[]
+  invitations WorkspaceInvitation[]
   projects Project[]
 }
 
@@ -66,6 +68,38 @@ enum WorkspaceRole {
   OWNER
   ADMIN
   MEMBER
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  REVOKED
+  EXPIRED
+}
+
+// ─────────────────────────────────────────────
+// WorkspaceInvitation — invitations to users
+// ─────────────────────────────────────────────
+model WorkspaceInvitation {
+  id          String           @id @default(cuid())
+  workspaceId String
+  email       String
+  role        WorkspaceRole    @default(MEMBER)
+  invitedById String
+  tokenHash   String           @unique
+  status      InvitationStatus @default(PENDING)
+  expiresAt   DateTime
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  invitedBy User      @relation("WorkspaceInvitationInviter", fields: [invitedById], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId])
+  @@index([email])
+  @@index([status])
+  @@index([expiresAt])
+  @@index([workspaceId, email])
 }
 
 // ─────────────────────────────────────────────
