@@ -1,6 +1,7 @@
 // Shared frontend types kept in sync with prisma/schema.prisma
 
 export type WorkspaceRole = "OWNER" | "ADMIN" | "MEMBER";
+export type InvitationStatus = "PENDING" | "ACCEPTED" | "REVOKED" | "EXPIRED";
 export type ProjectStatus = "ACTIVE" | "ARCHIVED" | "COMPLETED";
 export type TaskStatus   = "TODO" | "IN_PROGRESS" | "IN_REVIEW" | "DONE";
 export type TaskPriority = "LOW" | "MEDIUM" | "HIGH" | "URGENT";
@@ -17,7 +18,20 @@ export interface WorkspaceMember {
   userId: string;
   workspaceId: string;
   role: WorkspaceRole;
+  joinedAt: string;
   user: User;
+}
+
+export interface WorkspaceInvitation {
+  id: string;
+  workspaceId: string;
+  email: string;
+  role: WorkspaceRole;
+  invitedById: string;
+  status: InvitationStatus;
+  expiresAt: string;
+  createdAt: string;
+  invitedBy: User;
 }
 
 export interface Workspace {

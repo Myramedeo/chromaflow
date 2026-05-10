@@ -38,6 +38,11 @@ export async function logActivity({
 // Action constants — use these strings everywhere for consistency
 export const ACTIONS = {
   CREATED_WORKSPACE: "created_workspace",
+  INVITED_MEMBER: "invited_member",
+  REVOKED_INVITATION: "revoked_invitation",
+  ACCEPTED_INVITATION: "accepted_invitation",
+  UPDATED_MEMBER_ROLE: "updated_member_role",
+  REMOVED_MEMBER: "removed_member",
   CREATED_PROJECT: "created_project",
   UPDATED_PROJECT: "updated_project",
   ARCHIVED_PROJECT: "archived_project",
