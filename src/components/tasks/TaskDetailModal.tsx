@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import useSWR from "swr";
 import { useApiFetcher } from "@/lib/api-client";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -38,10 +38,6 @@ export function TaskDetailModal({ task, open, onClose }: Props) {
   const [title, setTitle] = useState(task.title);
   const [description, setDescription] = useState(task.description ?? "");
   const [assigneeId, setAssigneeId] = useState(task.assigneeId ?? "");
-
-  useEffect(() => {
-    setAssigneeId(task.assigneeId ?? "");
-  }, [task.assigneeId, task.id]);
 
   async function handleTitleBlur() {
     if (title.trim() === task.title) return;
@@ -132,7 +128,6 @@ export function TaskDetailModal({ task, open, onClose }: Props) {
 
   return (
     <Sheet
-      key={task.id}
       open={open}
       onOpenChange={(v) => !v && onClose()}
     >
@@ -161,7 +156,9 @@ export function TaskDetailModal({ task, open, onClose }: Props) {
               <Label className="text-xs text-gray-500">Status</Label>
               <Select value={task.status} onValueChange={handleStatusChange}>
                 <SelectTrigger className="h-8 text-sm">
-                  <SelectValue />
+                  <SelectValue>
+                    {KANBAN_COLUMNS.find((c) => c.id === task.status)?.label}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {KANBAN_COLUMNS.map((col) => (
@@ -183,7 +180,9 @@ export function TaskDetailModal({ task, open, onClose }: Props) {
               <Label className="text-xs text-gray-500">Priority</Label>
               <Select value={task.priority} onValueChange={handlePriorityChange}>
                 <SelectTrigger className="h-8 text-sm">
-                  <SelectValue />
+                  <SelectValue>
+                    {PRIORITY_CONFIG[task.priority]?.label}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {(Object.entries(PRIORITY_CONFIG) as [TaskPriority, { label: string; color: string }][]).map(
@@ -208,7 +207,11 @@ export function TaskDetailModal({ task, open, onClose }: Props) {
             <Label className="text-xs text-gray-500">Assignee</Label>
             <Select value={assigneeId} onValueChange={handleAssigneeChange}>
               <SelectTrigger className="h-8 text-sm">
-                <SelectValue />
+                <SelectValue>
+                  {workspace?.members.find((member) => member.user.id === task.assigneeId)?.user.name ??
+                    task.assignee?.name ??
+                    "Unassigned"}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="">
