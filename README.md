@@ -95,7 +95,9 @@ Every push and pull request runs two parallel GitHub Actions jobs.
 
 ## Roadmap
 
-- [ ] Email notifications (Resend) when a task is assigned
+- [ ] Email notifications (Resend) when a task is assigned or due soon
+- [ ] Task comment threads
 - [ ] CSV export of project tasks
+- [ ] Global search across workspace projects and tasks
 - [ ] Keyboard shortcuts for power users
 - [ ] Public marketing landing page

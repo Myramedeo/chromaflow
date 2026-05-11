@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import useSWR from "swr";
+import { useApiFetcher } from "@/lib/api-client";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { useTasks } from "@/hooks/useTasks";
-import type { Task, TaskStatus, TaskPriority } from "@/types";
+import type { Task, TaskStatus, TaskPriority, WorkspaceMember } from "@/types";
 import { PRIORITY_CONFIG, KANBAN_COLUMNS } from "@/types";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
@@ -26,10 +28,20 @@ export function TaskDetailModal({ task, open, onClose }: Props) {
   }>();
 
   const { updateTask, deleteTask } = useTasks(workspaceId, projectId);
+  const fetcher = useApiFetcher();
+  const { data: workspace } = useSWR<{ members: WorkspaceMember[] }>(
+    workspaceId ? `/api/workspaces/${workspaceId}` : null,
+    fetcher
+  );
 
   // Local state mirrors the task so fields feel instant
   const [title, setTitle] = useState(task.title);
   const [description, setDescription] = useState(task.description ?? "");
+  const [assigneeId, setAssigneeId] = useState(task.assigneeId ?? "");
+
+  useEffect(() => {
+    setAssigneeId(task.assigneeId ?? "");
+  }, [task.assigneeId, task.id]);
 
   async function handleTitleBlur() {
     if (title.trim() === task.title) return;
@@ -69,6 +81,32 @@ export function TaskDetailModal({ task, open, onClose }: Props) {
       await updateTask(task.id, { priority });
     } catch {
       toast.error("Failed to update priority");
+    }
+  }
+
+  async function handleAssigneeChange(value: string | null) {
+    if (value === null) return;
+    const nextAssigneeId = value || null;
+    const prevAssigneeId = assigneeId;
+
+    if (nextAssigneeId === task.assigneeId) {
+      setAssigneeId(value);
+      return;
+    }
+
+    setAssigneeId(value);
+
+    try {
+      await updateTask(task.id, { assigneeId: nextAssigneeId });
+      const member = workspace?.members.find((m) => m.user.id === value);
+      toast.success(
+        nextAssigneeId
+          ? `Assigned to ${member?.user.name ?? "user"}`
+          : "Task unassigned"
+      );
+    } catch {
+      setAssigneeId(prevAssigneeId);
+      toast.error("Failed to update assignee");
     }
   }
 
@@ -166,6 +204,28 @@ export function TaskDetailModal({ task, open, onClose }: Props) {
             </div>
           </div>
 
+          <div className="space-y-1.5">
+            <Label className="text-xs text-gray-500">Assignee</Label>
+            <Select value={assigneeId} onValueChange={handleAssigneeChange}>
+              <SelectTrigger className="h-8 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">
+                  <span className="text-gray-500">Unassigned</span>
+                </SelectItem>
+                {workspace?.members.map((member) => (
+                  <SelectItem key={member.id} value={member.user.id}>
+                    <div className="flex items-center gap-2">
+                      <span className="h-2.5 w-2.5 rounded-full bg-indigo-500" />
+                      <span>{member.user.name ?? member.user.email}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           {/* Due date */}
           <div className="space-y-1.5">
             <Label className="text-xs text-gray-500">Due date</Label>
@@ -207,12 +267,12 @@ export function TaskDetailModal({ task, open, onClose }: Props) {
                 })}
               </span>
             </div>
-            {task.assignee && (
-              <div className="flex items-center justify-between">
-                <span>Assigned to</span>
-                <span className="font-medium text-gray-700">{task.assignee.name}</span>
-              </div>
-            )}
+            <div className="flex items-center justify-between">
+              <span>Assigned to</span>
+              <span className="font-medium text-gray-700">
+                {task.assignee?.name ?? "Unassigned"}
+              </span>
+            </div>
           </div>
 
           {/* Delete */}
