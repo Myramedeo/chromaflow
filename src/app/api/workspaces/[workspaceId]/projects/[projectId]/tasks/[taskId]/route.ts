@@ -12,6 +12,7 @@ import {
   parseBody,
 } from "@/lib/api-helpers";
 import { logActivity, ACTIONS } from "@/lib/activity";
+import { sendAssignmentNotificationEmail } from "@/lib/email";
 
 interface UpdateTaskBody {
   title?: string;
@@ -30,6 +31,11 @@ export const PATCH = withAuth(async (req, { userId, params }) => {
   const membership = await getWorkspaceMembership(userId, workspaceId);
   if (!membership) return forbidden();
 
+  const project = await db.project.findFirst({
+    where: { id: projectId, workspaceId },
+  });
+  if (!project) return notFound("Project");
+
   const task = await db.task.findFirst({
     where: { id: taskId, projectId },
   });
@@ -39,6 +45,7 @@ export const PATCH = withAuth(async (req, { userId, params }) => {
   if (!body) return error("Invalid request body");
 
   const prevStatus = task.status;
+  const prevAssigneeId = task.assigneeId;
 
   const updated = await db.task.update({
     where: { id: taskId },
@@ -54,7 +61,7 @@ export const PATCH = withAuth(async (req, { userId, params }) => {
       ...(body.assigneeId !== undefined && { assigneeId: body.assigneeId }),
     },
     include: {
-      assignee: { select: { id: true, name: true, avatarUrl: true } },
+      assignee: { select: { id: true, name: true, email: true, avatarUrl: true } },
       creator:  { select: { id: true, name: true } },
     },
   });
@@ -84,6 +91,21 @@ export const PATCH = withAuth(async (req, { userId, params }) => {
       action: ACTIONS.UPDATED_TASK,
       metadata: body,
     });
+  }
+
+  if (body.assigneeId !== undefined && body.assigneeId !== prevAssigneeId && updated.assignee?.email) {
+    try {
+      await sendAssignmentNotificationEmail({
+        to: updated.assignee.email,
+        toName: updated.assignee.name,
+        taskTitle: updated.title,
+        projectName: project.name,
+        assignerName: updated.creator.name,
+        taskUrl: `${process.env.NEXT_PUBLIC_APP_URL ?? new URL(req.url).origin}/dashboard/${workspaceId}/projects/${projectId}`,
+      });
+    } catch (err) {
+      console.error("Failed to send assignment notification email:", err);
+    }
   }
 
   return ok(updated);
