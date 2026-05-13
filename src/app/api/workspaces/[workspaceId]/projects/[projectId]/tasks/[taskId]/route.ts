@@ -57,6 +57,8 @@ export const PATCH = withAuth(async (req, { userId, params }) => {
       ...(body.position !== undefined && { position: body.position }),
       ...(body.dueDate !== undefined && {
         dueDate: body.dueDate ? new Date(body.dueDate) : null,
+        // Reset notification sent flag when due date changes so it can be reminded again
+        notificationSentAt: null,
       }),
       ...(body.assigneeId !== undefined && { assigneeId: body.assigneeId }),
     },

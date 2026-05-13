@@ -142,6 +142,7 @@ model Task {
   dueDate     DateTime?
   assigneeId  String?
   creatorId   String
+  notificationSentAt DateTime?            // tracks if due date notification was sent
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 
@@ -152,6 +153,7 @@ model Task {
 
   @@index([projectId])
   @@index([assigneeId])
+  @@index([dueDate])
 }
 
 enum TaskStatus {

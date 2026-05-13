@@ -95,3 +95,83 @@ export async function sendAssignmentNotificationEmail({
     throw new Error(`Resend request failed (${response.status}): ${body}`);
   }
 }
+
+interface SendDueDateReminderEmailOptions {
+  to: string;
+  toName?: string | null;
+  taskTitle: string;
+  projectName: string;
+  dueDate: Date;
+  taskUrl?: string;
+}
+
+export async function sendDueDateReminderEmail({
+  to,
+  toName,
+  taskTitle,
+  projectName,
+  dueDate,
+  taskUrl,
+}: SendDueDateReminderEmailOptions) {
+  const apiKey = getResendApiKey();
+  const from = getDefaultFromAddress();
+  const dueDateStr = dueDate.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+  const subject = `Reminder: ${taskTitle} due on ${dueDateStr}`;
+
+  const html = `
+    <div style="font-family:system-ui, sans-serif; line-height:1.5; color:#111827;">
+      <p>Hi ${toName ?? "there"},</p>
+      <p>
+        This is a reminder that a task is coming due soon.
+      </p>
+      <dl style="margin:1rem 0;">
+        <div style="margin-bottom:.75rem;">
+          <dt style="font-weight:600;">Task</dt>
+          <dd>${taskTitle}</dd>
+        </div>
+        <div style="margin-bottom:.75rem;">
+          <dt style="font-weight:600;">Project</dt>
+          <dd>${projectName}</dd>
+        </div>
+        <div style="margin-bottom:.75rem;">
+          <dt style="font-weight:600;">Due date</dt>
+          <dd>${dueDateStr}</dd>
+        </div>
+      </dl>
+      ${taskUrl ? `<p><a href="${taskUrl}" style="color:#2563eb;">View task</a></p>` : ""}
+      <p>Thanks,<br/>The Chromaflow team</p>
+    </div>
+  `;
+
+  const text = `Hi ${toName ?? "there"},\n\n` +
+    `This is a reminder that a task is coming due soon.\n\n` +
+    `Task: ${taskTitle}\n` +
+    `Project: ${projectName}\n` +
+    `Due: ${dueDateStr}\n` +
+    `${taskUrl ? `View: ${taskUrl}\n` : ""}` +
+    `\nThanks,\nChromaflow\n`;
+
+  const response = await fetch(RESEND_API_URL, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from,
+      to,
+      subject,
+      html,
+      text,
+    }),
+  });
+
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(`Resend request failed (${response.status}): ${body}`);
+  }
+}
