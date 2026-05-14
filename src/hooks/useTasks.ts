@@ -12,7 +12,11 @@ export function useTasks(workspaceId: string, projectId: string) {
     fetcher
   );
  
-  async function createTask(payload: { title: string; status?: TaskStatus }) {
+  async function createTask(payload: {
+    title: string;
+    status?: TaskStatus;
+    assigneeId?: string | null;
+  }) {
     const task = await mutator<Task>(`${base}/tasks`, "POST", payload);
     await mutate();
     return task;

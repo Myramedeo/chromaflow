@@ -90,18 +90,31 @@ export function TaskCard({ task, isDragOverlay = false }: Props) {
           )}
 
           {task.assignee && (
-            <div
-              className="flex h-5 w-5 items-center justify-center rounded-full bg-indigo-100 text-[9px] font-bold text-indigo-600 uppercase"
-              title={task.assignee.name ?? ""}
-            >
-              {task.assignee.name?.[0] ?? "?"}
-            </div>
+            <>
+              {task.assignee.avatarUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={task.assignee.avatarUrl}
+                  alt={task.assignee.name ?? "User"}
+                  title={task.assignee.name ?? ""}
+                  className="h-5 w-5 rounded-full object-cover"
+                />
+              ) : (
+                <div
+                  className="flex h-5 w-5 items-center justify-center rounded-full bg-indigo-100 text-[9px] font-bold text-indigo-600 uppercase"
+                  title={task.assignee.name ?? ""}
+                >
+                  {task.assignee.name?.[0] ?? "?"}
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
 
       {!isDragOverlay && (
         <TaskDetailModal
+          key={task.id}
           task={task}
           open={detailOpen}
           onClose={() => setDetailOpen(false)}

@@ -13,6 +13,7 @@ import {
   parseBody,
 } from "@/lib/api-helpers";
 import { logActivity, ACTIONS } from "@/lib/activity";
+import { sendAssignmentNotificationEmail } from "@/lib/email";
 
 export const GET = withAuth(async (_req, { userId, params }) => {
   const { workspaceId, projectId } = params;
@@ -84,7 +85,7 @@ export const POST = withAuth(async (req, { userId, params }) => {
       creatorId: userId,
     },
     include: {
-      assignee: { select: { id: true, name: true, avatarUrl: true } },
+      assignee: { select: { id: true, name: true, email: true, avatarUrl: true } },
       creator:  { select: { id: true, name: true } },
     },
   });
@@ -96,6 +97,21 @@ export const POST = withAuth(async (req, { userId, params }) => {
     action: ACTIONS.CREATED_TASK,
     metadata: { title: task.title, status: task.status },
   });
+
+  if (body.assigneeId && task.assignee?.email) {
+    try {
+      await sendAssignmentNotificationEmail({
+        to: task.assignee.email,
+        toName: task.assignee.name,
+        taskTitle: task.title,
+        projectName: project.name,
+        assignerName: task.creator.name,
+        taskUrl: `${process.env.NEXT_PUBLIC_APP_URL ?? new URL(req.url).origin}/dashboard/${workspaceId}/projects/${projectId}`,
+      });
+    } catch (err) {
+      console.error("Failed to send assignment notification email:", err);
+    }
+  }
 
   return created(task);
 });
