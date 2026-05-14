@@ -70,6 +70,15 @@ export interface Task {
   creator: Pick<User, "id" | "name">;
 }
 
+export interface Comment {
+  id: string;
+  taskId: string;
+  authorId: string;
+  content: string;
+  createdAt: string;
+  author: Pick<User, "id" | "name" | "avatarUrl">;
+}
+
 // Column definition used by the Kanban board
 export interface KanbanColumn {
   id: TaskStatus;
