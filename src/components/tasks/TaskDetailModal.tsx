@@ -3,12 +3,14 @@
 import { useState } from "react";
 import useSWR from "swr";
 import { useApiFetcher } from "@/lib/api-client";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { useTasks } from "@/hooks/useTasks";
-import type { Task, TaskStatus, TaskPriority, WorkspaceMember } from "@/types";
+import { useComments } from "@/hooks/useComments";
+import type { Task, TaskStatus, TaskPriority, WorkspaceMember, Comment } from "@/types";
 import { PRIORITY_CONFIG, KANBAN_COLUMNS } from "@/types";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
@@ -28,6 +30,7 @@ export function TaskDetailModal({ task, open, onClose }: Props) {
   }>();
 
   const { updateTask, deleteTask } = useTasks(workspaceId, projectId);
+  const { comments, createComment } = useComments(workspaceId, projectId, task.id);
   const fetcher = useApiFetcher();
   const { data: workspace } = useSWR<{ members: WorkspaceMember[] }>(
     workspaceId ? `/api/workspaces/${workspaceId}` : null,
@@ -38,6 +41,7 @@ export function TaskDetailModal({ task, open, onClose }: Props) {
   const [title, setTitle] = useState(task.title);
   const [description, setDescription] = useState(task.description ?? "");
   const [assigneeId, setAssigneeId] = useState(task.assigneeId ?? "");
+  const [newComment, setNewComment] = useState("");
 
   async function handleTitleBlur() {
     if (title.trim() === task.title) return;
@@ -123,6 +127,17 @@ export function TaskDetailModal({ task, open, onClose }: Props) {
       toast.success("Task deleted");
     } catch {
       toast.error("Failed to delete task");
+    }
+  }
+
+  async function handleAddComment() {
+    if (!newComment.trim()) return;
+    try {
+      await createComment(newComment.trim());
+      setNewComment("");
+      toast.success("Comment added");
+    } catch {
+      toast.error("Failed to add comment");
     }
   }
 
@@ -254,6 +269,58 @@ export function TaskDetailModal({ task, open, onClose }: Props) {
               onChange={(e) => setDescription(e.target.value)}
               onBlur={handleDescriptionBlur}
             />
+          </div>
+
+          {/* Comments */}
+          <div className="space-y-4">
+            <Label className="text-xs text-gray-500">Comments</Label>
+            <div className="space-y-3 max-h-60 overflow-y-auto">
+              {comments.map((comment) => (
+                <div key={comment.id} className="flex gap-3">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={comment.author.avatarUrl || undefined} />
+                    <AvatarFallback>
+                      {comment.author.name?.charAt(0) || "U"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-gray-900">
+                        {comment.author.name || "Anonymous"}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {new Date(comment.createdAt).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          hour: "numeric",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-700 mt-1">{comment.content}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Add a comment..."
+                className="flex-1 h-8 rounded-md border border-gray-200 px-3 text-sm text-gray-700 focus:border-indigo-400 focus:outline-none"
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleAddComment();
+                }}
+              />
+              <Button
+                size="sm"
+                onClick={handleAddComment}
+                disabled={!newComment.trim()}
+              >
+                Post
+              </Button>
+            </div>
           </div>
 
           {/* Meta */}
