@@ -7,7 +7,10 @@ import { KanbanBoard } from "@/components/tasks/KanbanBoard";
 import { ActiveUsers } from "@/components/tasks/ActiveUsers";
 import { ActivityFeed } from "@/components/tasks/ActivityFeed";
 import { Skeleton } from "@/components/ui/skeleton";
-import { LayoutGrid } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { LayoutGrid, Download } from "lucide-react";
+import { toast } from "sonner";
+import { exportTasksAsCSV } from "@/lib/export";
 import type { PresenceUser } from "@/hooks/useRealtimeTasks";
 
 export default function ProjectPage() {
@@ -19,10 +22,24 @@ export default function ProjectPage() {
   const { projects, isLoading } = useProjects(workspaceId);
   const project = projects.find((p) => p.id === projectId);
   const [activeUsers, setActiveUsers] = useState<PresenceUser[]>([]);
+  const [isExporting, setIsExporting] = useState(false);
 
   const handleActiveUsersChange = useCallback((users: PresenceUser[]) => {
     setActiveUsers(users);
   }, []);
+
+  const handleExportCSV = async () => {
+    if (!project) return;
+    setIsExporting(true);
+    try {
+      await exportTasksAsCSV(workspaceId, projectId, project.name);
+      toast.success("Tasks exported to CSV");
+    } catch {
+      toast.error("Failed to export tasks");
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   return (
     <div className="flex h-full flex-col">
@@ -47,6 +64,18 @@ export default function ProjectPage() {
 
             <div className="flex-1" />
  
+            {/* Export button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleExportCSV}
+              disabled={isExporting || !project}
+              className="gap-1.5"
+            >
+              <Download className="h-3.5 w-3.5" />
+              {isExporting ? "Exporting..." : "Export CSV"}
+            </Button>
+
             {/* Live viewer avatars */}
             <ActiveUsers users={activeUsers} />
 
