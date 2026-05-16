@@ -8,9 +8,10 @@ import { ActiveUsers } from "@/components/tasks/ActiveUsers";
 import { ActivityFeed } from "@/components/tasks/ActivityFeed";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { LayoutGrid, Download } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { LayoutGrid, Download, ChevronDown, FileText } from "lucide-react";
 import { toast } from "sonner";
-import { exportTasksAsCSV } from "@/lib/export";
+import { exportTasks, type ExportFormat } from "@/lib/export";
 import type { PresenceUser } from "@/hooks/useRealtimeTasks";
 
 export default function ProjectPage() {
@@ -23,17 +24,18 @@ export default function ProjectPage() {
   const project = projects.find((p) => p.id === projectId);
   const [activeUsers, setActiveUsers] = useState<PresenceUser[]>([]);
   const [isExporting, setIsExporting] = useState(false);
+  const [exportFormat, setExportFormat] = useState<ExportFormat>("csv");
 
   const handleActiveUsersChange = useCallback((users: PresenceUser[]) => {
     setActiveUsers(users);
   }, []);
 
-  const handleExportCSV = async () => {
+  const handleExport = async () => {
     if (!project) return;
     setIsExporting(true);
     try {
-      await exportTasksAsCSV(workspaceId, projectId, project.name);
-      toast.success("Tasks exported to CSV");
+      await exportTasks(workspaceId, projectId, project.name, exportFormat);
+      toast.success(`Tasks exported to ${exportFormat.toUpperCase()}`);
     } catch {
       toast.error("Failed to export tasks");
     } finally {
@@ -64,17 +66,45 @@ export default function ProjectPage() {
 
             <div className="flex-1" />
  
-            {/* Export button */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleExportCSV}
-              disabled={isExporting || !project}
-              className="gap-1.5"
-            >
-              <Download className="h-3.5 w-3.5" />
-              {isExporting ? "Exporting..." : "Export CSV"}
-            </Button>
+            <div className="flex items-center gap-2">
+              <Popover>
+                <PopoverTrigger>
+                  <Button variant="ghost" size="sm" className="gap-1.5">
+                    <FileText className="h-3.5 w-3.5" />
+                    {exportFormat.toUpperCase()}
+                    <ChevronDown className="h-3.5 w-3.5" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent side="bottom" align="end" className="w-40 p-1">
+                  <Button
+                    variant={exportFormat === "csv" ? "secondary" : "ghost"}
+                    size="sm"
+                    className="justify-start w-full"
+                    onClick={() => setExportFormat("csv")}
+                  >
+                    CSV
+                  </Button>
+                  <Button
+                    variant={exportFormat === "pdf" ? "secondary" : "ghost"}
+                    size="sm"
+                    className="justify-start w-full"
+                    onClick={() => setExportFormat("pdf")}
+                  >
+                    PDF
+                  </Button>
+                </PopoverContent>
+              </Popover>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleExport}
+                disabled={isExporting || !project}
+                className="gap-1.5"
+              >
+                <Download className="h-3.5 w-3.5" />
+                {isExporting ? "Exporting..." : "Export"}
+              </Button>
+            </div>
 
             {/* Live viewer avatars */}
             <ActiveUsers users={activeUsers} />

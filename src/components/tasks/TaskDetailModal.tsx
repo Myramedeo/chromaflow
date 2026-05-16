@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { useTasks } from "@/hooks/useTasks";
 import { useComments } from "@/hooks/useComments";
-import type { Task, TaskStatus, TaskPriority, WorkspaceMember, Comment } from "@/types";
+import type { Task, TaskStatus, TaskPriority, WorkspaceMember } from "@/types";
 import { PRIORITY_CONFIG, KANBAN_COLUMNS } from "@/types";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
