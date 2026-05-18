@@ -68,6 +68,11 @@ export interface Task {
   createdAt: string;
   assignee: Pick<User, "id" | "name" | "avatarUrl"> | null;
   creator: Pick<User, "id" | "name">;
+
+  project?: {
+    id: string;
+    name: string;
+  };
 }
 
 export interface Comment {
