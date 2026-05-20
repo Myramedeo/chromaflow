@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -10,6 +10,7 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
+import { useKeyboardShortcut } from "@/hooks/useKeyboardShortcut";
 import { arrayMove } from "@dnd-kit/sortable";
 import { KanbanColumn } from "./KanbanColumn";
 import { TaskCard } from "./TaskCard";
@@ -43,6 +44,54 @@ export function KanbanBoard({ workspaceId, projectId, onActiveUsersChange }: Pro
         .sort((a, b) => a.position - b.position),
     [tasks]
   );
+
+  const [quickAddOpen, setQuickAddOpen] = useState(false);
+  const [quickAddTitle, setQuickAddTitle] = useState("");
+  const [isQuickAdding, setIsQuickAdding] = useState(false);
+  const quickAddInputRef = useRef<HTMLInputElement>(null);
+  const firstColumn = KANBAN_COLUMNS[0];
+
+  useKeyboardShortcut(
+    { key: "n", mod: "ctrlOrMeta" },
+    () => setQuickAddOpen(true)
+  );
+
+  useKeyboardShortcut(
+    { key: "Escape" },
+    () => quickAddOpen && setQuickAddOpen(false),
+    quickAddOpen
+  );
+
+  useEffect(() => {
+    if (!quickAddOpen) return;
+    quickAddInputRef.current?.focus();
+  }, [quickAddOpen]);
+
+  async function handleQuickAddSubmit() {
+    const title = quickAddTitle.trim();
+    if (!title || !firstColumn) return;
+
+    setIsQuickAdding(true);
+    try {
+      await createTask({ title, status: firstColumn.id });
+      setQuickAddTitle("");
+      setQuickAddOpen(false);
+      toast.success("Task created");
+    } catch {
+      toast.error("Failed to create task");
+    } finally {
+      setIsQuickAdding(false);
+    }
+  }
+
+  function handleQuickAddKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter") {
+      handleQuickAddSubmit();
+    }
+    if (e.key === "Escape") {
+      setQuickAddOpen(false);
+    }
+  }
 
   function handleDragStart({ active }: DragStartEvent) {
     const task = tasks.find((t) => t.id === active.id);
@@ -118,26 +167,76 @@ export function KanbanBoard({ workspaceId, projectId, onActiveUsersChange }: Pro
   }
 
   return (
-    <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <div className="flex gap-4 overflow-x-auto p-6 pb-8">
-        {KANBAN_COLUMNS.map((col) => (
-          <KanbanColumn
-            key={col.id}
-            column={col}
-            tasks={tasksByStatus(col.id)}
-            onAddTask={(title) => createTask({ title, status: col.id }).then(() => {})}
-          />
-        ))}
-      </div>
-
-      {/* Ghost card shown while dragging */}
-      <DragOverlay>
-        {activeTask ? (
-          <div className="rotate-2 opacity-90">
-            <TaskCard task={activeTask} isDragOverlay />
+    <>
+      {quickAddOpen && (
+        <div className="fixed inset-x-0 top-20 z-50 flex justify-center px-4">
+          <div className="w-full max-w-xl rounded-2xl border border-gray-200 bg-white p-4 shadow-xl ring-1 ring-black/5">
+            <div className="flex items-center justify-between gap-3 pb-3">
+              <div>
+                <p className="text-sm font-semibold text-gray-900">Quick add task</p>
+                <p className="text-xs text-gray-500">Create a new task in the first column.</p>
+              </div>
+              <button
+                type="button"
+                className="rounded-md px-3 py-1 text-sm text-gray-600 hover:bg-gray-100"
+                onClick={() => setQuickAddOpen(false)}
+              >
+                Close
+              </button>
+            </div>
+            <div className="flex flex-col gap-3">
+              <input
+                ref={quickAddInputRef}
+                className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
+                placeholder="New task title…"
+                value={quickAddTitle}
+                onChange={(e) => setQuickAddTitle(e.target.value)}
+                onKeyDown={handleQuickAddKeyDown}
+                aria-label="Quick add task title"
+              />
+              <div className="flex items-center justify-between gap-3">
+                <button
+                  type="button"
+                  className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-indigo-300"
+                  onClick={handleQuickAddSubmit}
+                  disabled={!quickAddTitle.trim() || isQuickAdding}
+                >
+                  {isQuickAdding ? "Creating…" : "Create task"}
+                </button>
+                <span className="text-xs text-gray-500">Shortcut: Ctrl/Cmd+N</span>
+              </div>
+            </div>
           </div>
-        ) : null}
-      </DragOverlay>
-    </DndContext>
+        </div>
+      )}
+
+      <DndContext
+        sensors={sensors}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+      >
+        <div className="flex gap-4 overflow-x-auto p-6 pb-8">
+          {KANBAN_COLUMNS.map((col) => (
+            <KanbanColumn
+              key={col.id}
+              column={col}
+              tasks={tasksByStatus(col.id)}
+              onAddTask={(title) =>
+                createTask({ title, status: col.id }).then(() => {})
+              }
+            />
+          ))}
+        </div>
+
+        {/* Ghost card shown while dragging */}
+        <DragOverlay>
+          {activeTask ? (
+            <div className="rotate-2 opacity-90">
+              <TaskCard task={activeTask} isDragOverlay />
+            </div>
+          ) : null}
+        </DragOverlay>
+      </DndContext>
+    </>
   );
 }
