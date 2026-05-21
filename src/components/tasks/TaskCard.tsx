@@ -43,13 +43,27 @@ export function TaskCard({ task, isDragOverlay = false }: Props) {
         style={style}
         {...attributes}
         {...listeners}
+        role="button"
+        tabIndex={0}
         onClick={() => !isDragOverlay && setDetailOpen(true)}
+        onKeyDown={(e) => {
+          if (isDragOverlay) return;
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setDetailOpen(true);
+          }
+          if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "e") {
+            e.preventDefault();
+            setDetailOpen(true);
+          }
+        }}
         className={cn(
           "group cursor-pointer rounded-lg border border-gray-200 bg-white p-3 shadow-sm",
-          "hover:border-indigo-200 hover:shadow-md transition-all",
+          "hover:border-indigo-200 hover:shadow-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500",
           isDragging && "opacity-40 shadow-lg",
           isDragOverlay && "shadow-xl"
         )}
+        aria-label={`Open task ${task.title}`}
       >
         {/* Priority indicator */}
         <div className="mb-2 flex items-center justify-between gap-2">
