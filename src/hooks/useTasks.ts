@@ -34,18 +34,32 @@ export function useTasks(workspaceId: string, projectId: string) {
       assigneeId: string | null;
     }>
   ) {
-    const updated = await mutator<Task>(
-      `${base}/tasks/${taskId}`,
-      "PATCH",
-      payload
-    );
-    // Update the cache without a full refetch for snappy UI
+    // Optimistically update the cache immediately
+    const originalTasks = data;
     await mutate(
       (current) =>
-        current?.map((t) => (t.id === taskId ? { ...t, ...updated } : t)),
+        current?.map((t) => (t.id === taskId ? { ...t, ...payload } : t)),
       { revalidate: false }
     );
-    return updated;
+
+    try {
+      const updated = await mutator<Task>(
+        `${base}/tasks/${taskId}`,
+        "PATCH",
+        payload
+      );
+      // Update cache with server response to ensure correctness
+      await mutate(
+        (current) =>
+          current?.map((t) => (t.id === taskId ? { ...t, ...updated } : t)),
+        { revalidate: false }
+      );
+      return updated;
+    } catch (error) {
+      // Revert optimistic update on failure
+      await mutate(originalTasks, { revalidate: false });
+      throw error;
+    }
   }
  
   async function deleteTask(taskId: string) {
