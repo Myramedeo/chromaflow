@@ -10,11 +10,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { useTasks } from "@/hooks/useTasks";
 import { useComments } from "@/hooks/useComments";
+import { useSubtasks } from "@/hooks/useSubtasks";
 import type { Task, TaskStatus, TaskPriority, WorkspaceMember } from "@/types";
 import { PRIORITY_CONFIG, KANBAN_COLUMNS } from "@/types";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
-import { Trash2 } from "lucide-react";
+import { Trash2, CheckCircle2, Circle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -31,6 +32,7 @@ export function TaskDetailModal({ task, open, onClose }: Props) {
 
   const { updateTask, deleteTask } = useTasks(workspaceId, projectId);
   const { comments, createComment } = useComments(workspaceId, projectId, task.id);
+  const { subtasks, createSubtask, updateSubtask, deleteSubtask } = useSubtasks(workspaceId, projectId, task.id);
   const fetcher = useApiFetcher();
   const { data: workspace } = useSWR<{ members: WorkspaceMember[] }>(
     workspaceId ? `/api/workspaces/${workspaceId}` : null,
@@ -42,6 +44,7 @@ export function TaskDetailModal({ task, open, onClose }: Props) {
   const [description, setDescription] = useState(task.description ?? "");
   const [assigneeId, setAssigneeId] = useState(task.assigneeId ?? "");
   const [newComment, setNewComment] = useState("");
+  const [newSubtask, setNewSubtask] = useState("");
 
   async function handleTitleBlur() {
     if (title.trim() === task.title) return;
@@ -138,6 +141,35 @@ export function TaskDetailModal({ task, open, onClose }: Props) {
       toast.success("Comment added");
     } catch {
       toast.error("Failed to add comment");
+    }
+  }
+
+  async function handleAddSubtask() {
+    if (!newSubtask.trim()) return;
+    try {
+      await createSubtask(newSubtask.trim());
+      setNewSubtask("");
+      toast.success("Subtask added");
+    } catch {
+      toast.error("Failed to add subtask");
+    }
+  }
+
+  async function handleToggleSubtask(subtaskId: string, completed: boolean) {
+    try {
+      await updateSubtask(subtaskId, { completed: !completed });
+    } catch {
+      toast.error("Failed to update subtask");
+    }
+  }
+
+  async function handleDeleteSubtask(subtaskId: string) {
+    if (!confirm("Delete this subtask?")) return;
+    try {
+      await deleteSubtask(subtaskId);
+      toast.success("Subtask deleted");
+    } catch {
+      toast.error("Failed to delete subtask");
     }
   }
 
@@ -269,6 +301,69 @@ export function TaskDetailModal({ task, open, onClose }: Props) {
               onChange={(e) => setDescription(e.target.value)}
               onBlur={handleDescriptionBlur}
             />
+          </div>
+
+          {/* Subtasks */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Label className="text-xs text-gray-500">Subtasks</Label>
+              {subtasks.length > 0 && (
+                <span className="text-xs text-gray-500">
+                  {subtasks.filter((s) => s.completed).length} of {subtasks.length}
+                </span>
+              )}
+            </div>
+            {subtasks.length > 0 && (
+              <div className="space-y-2 max-h-40 overflow-y-auto">
+                {subtasks.map((subtask) => (
+                  <div key={subtask.id} className="flex items-center gap-2 group">
+                    <button
+                      onClick={() => handleToggleSubtask(subtask.id, subtask.completed)}
+                      className="flex-shrink-0 text-gray-400 hover:text-indigo-500 transition-colors"
+                    >
+                      {subtask.completed ? (
+                        <CheckCircle2 className="h-4 w-4 text-indigo-500" />
+                      ) : (
+                        <Circle className="h-4 w-4" />
+                      )}
+                    </button>
+                    <span
+                      className={cn(
+                        "flex-1 text-sm",
+                        subtask.completed ? "line-through text-gray-400" : "text-gray-700"
+                      )}
+                    >
+                      {subtask.title}
+                    </span>
+                    <button
+                      onClick={() => handleDeleteSubtask(subtask.id)}
+                      className="flex-shrink-0 opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition-all"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Add a subtask…"
+                className="flex-1 h-8 rounded-md border border-gray-200 px-3 text-sm text-gray-700 focus:border-indigo-400 focus:outline-none"
+                value={newSubtask}
+                onChange={(e) => setNewSubtask(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleAddSubtask();
+                }}
+              />
+              <Button
+                size="sm"
+                onClick={handleAddSubtask}
+                disabled={!newSubtask.trim()}
+              >
+                Add
+              </Button>
+            </div>
           </div>
 
           {/* Comments */}

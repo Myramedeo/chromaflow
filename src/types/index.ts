@@ -68,6 +68,7 @@ export interface Task {
   createdAt: string;
   assignee: Pick<User, "id" | "name" | "avatarUrl"> | null;
   creator: Pick<User, "id" | "name">;
+  subtasks?: Subtask[];
 
   project?: {
     id: string;
@@ -82,6 +83,15 @@ export interface Comment {
   content: string;
   createdAt: string;
   author: Pick<User, "id" | "name" | "avatarUrl">;
+}
+
+export interface Subtask {
+  id: string;
+  taskId: string;
+  title: string;
+  completed: boolean;
+  position: number;
+  createdAt: string;
 }
 
 // Column definition used by the Kanban board
