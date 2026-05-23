@@ -179,7 +179,7 @@ export function TaskDetailModal({ task, open, onClose }: Props) {
       onOpenChange={(v) => !v && onClose()}
     >
       <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
-        <SheetHeader className="mb-6 px-0">
+        <SheetHeader className="mb-2 px-0">
           <SheetTitle className="sr-only">Task details</SheetTitle>
           {/* Inline editable title */}
           <textarea
@@ -305,12 +305,22 @@ export function TaskDetailModal({ task, open, onClose }: Props) {
 
           {/* Subtasks */}
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <Label className="text-xs text-gray-500">Subtasks</Label>
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs text-gray-500">Subtasks</Label>
+                {subtasks.length > 0 && (
+                  <span className="text-xs text-gray-500">
+                    {subtasks.filter((s) => s.completed).length} of {subtasks.length}
+                  </span>
+                )}
+              </div>
               {subtasks.length > 0 && (
-                <span className="text-xs text-gray-500">
-                  {subtasks.filter((s) => s.completed).length} of {subtasks.length}
-                </span>
+                <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-indigo-500 transition-all duration-300"
+                    style={{ width: `${(subtasks.filter((s) => s.completed).length / subtasks.length) * 100}%` }}
+                  />
+                </div>
               )}
             </div>
             {subtasks.length > 0 && (
