@@ -16,8 +16,8 @@ export default function WorkspacePage() {
     <div className="p-8">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Projects</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Projects</h1>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
             {isLoading ? "Loading…" : `${projects.length} project${projects.length !== 1 ? "s" : ""}`}
           </p>
         </div>
@@ -36,9 +36,9 @@ export default function WorkspacePage() {
           ))}
         </div>
       ) : projects.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-200 py-20 text-center">
-          <p className="text-sm font-medium text-gray-500">No projects yet</p>
-          <p className="mt-1 text-xs text-gray-400">Create your first project to get started</p>
+        <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-200 py-20 text-center dark:border-gray-700">
+          <p className="text-sm font-medium text-gray-500 dark:text-gray-400">No projects yet</p>
+          <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">Create your first project to get started</p>
           <CreateProjectModal workspaceId={workspaceId}>
             <Button asChild variant="outline" size="sm" className="mt-4 gap-1.5">
               <Plus className="h-4 w-4" />

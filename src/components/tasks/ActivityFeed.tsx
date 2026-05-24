@@ -34,7 +34,7 @@ function ActivityAvatar({ entry }: { entry: ActivityEntry }) {
   }
 
   return (
-    <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100 text-[9px] font-bold text-indigo-600">
+    <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100 text-[9px] font-bold text-indigo-600 dark:bg-indigo-900 dark:text-indigo-300">
       {initials}
     </div>
   );
@@ -46,14 +46,14 @@ function ActivityItem({ entry }: { entry: ActivityEntry }) {
   });
 
   return (
-    <div className="flex gap-2.5 py-2.5 border-b border-gray-100 last:border-0">
+    <div className="flex gap-2.5 py-2.5 border-b border-gray-100 last:border-0 dark:border-gray-700">
       <ActivityAvatar entry={entry} />
       <div className="flex-1 min-w-0">
-        <p className="text-xs text-gray-700 leading-relaxed">
-          <span className="font-medium">{entry.user.name ?? "Someone"}</span>{" "}
+        <p className="text-xs text-gray-700 leading-relaxed dark:text-gray-300">
+          <span className="font-medium dark:text-gray-200">{entry.user.name ?? "Someone"}</span>{" "}
           {formatAction(entry)}
         </p>
-        <p className="mt-0.5 text-[11px] text-gray-400">{timeAgo}</p>
+        <p className="mt-0.5 text-[11px] text-gray-400 dark:text-gray-500">{timeAgo}</p>
       </div>
     </div>
   );
@@ -66,18 +66,18 @@ export function ActivityFeed({ workspaceId, projectId }: Props) {
   return (
     <aside
       className={cn(
-        "flex flex-col border-l border-gray-200 bg-white transition-all duration-200",
+        "flex flex-col border-l border-gray-200 bg-white transition-all duration-200 dark:border-gray-700 dark:bg-gray-800",
         open ? "w-64" : "w-10"
       )}
     >
       {/* Header / toggle */}
       <button
         onClick={() => setOpen((v) => !v)}
-        className="flex h-14 w-full items-center gap-2 border-b border-gray-200 px-3 text-gray-500 hover:text-gray-700 transition-colors"
+        className="flex h-14 w-full items-center gap-2 border-b border-gray-200 px-3 text-gray-500 hover:text-gray-700 transition-colors dark:border-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
       >
         <Activity className="h-4 w-4 flex-shrink-0" />
         {open && (
-          <span className="flex-1 text-left text-xs font-medium">Activity</span>
+          <span className="flex-1 text-left text-xs font-medium dark:text-white">Activity</span>
         )}
         <ChevronRight
           className={cn(

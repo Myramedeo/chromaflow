@@ -6,6 +6,7 @@ import { useUser, useClerk } from "@clerk/nextjs";
 import { useWorkspaces } from "@/hooks/useWorkspaces";
 import { useProjects } from "@/hooks/useProjects";
 import { CreateWorkspaceModal } from "./CreateWorkspaceModal";
+import { ThemeToggle } from "./ThemeToggle";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -26,22 +27,22 @@ export function Sidebar() {
   const { projects, isLoading: projLoading } = useProjects(activeWorkspaceId);
 
   return (
-    <aside className="flex h-full w-60 flex-col border-r border-gray-200 bg-white">
+    <aside className="flex h-full w-60 flex-col border-r border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900">
       {/* Brand */}
-      <div className="flex h-14 items-center gap-2 border-b border-gray-200 px-4">
+      <div className="flex h-14 items-center gap-2 border-b border-gray-200 px-4 dark:border-gray-700">
         <FolderKanban className="h-5 w-5 text-indigo-600" />
-        <span className="text-sm font-semibold tracking-tight">Chromaflow</span>
+        <span className="text-sm font-semibold tracking-tight dark:text-white">Chromaflow</span>
       </div>
 
       {/* Workspaces */}
       <div className="flex-1 overflow-y-auto px-3 py-3 space-y-5">
         <section>
           <div className="mb-1 flex items-center justify-between px-1">
-            <span className="text-[11px] font-medium uppercase tracking-widest text-gray-400">
+            <span className="text-[11px] font-medium uppercase tracking-widest text-gray-400 dark:text-gray-500">
               Workspaces
             </span>
             <CreateWorkspaceModal>
-              <div className="rounded p-0.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 cursor-pointer">
+              <div className="rounded p-0.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300 cursor-pointer">
                 <Plus className="h-3.5 w-3.5" />
               </div>
             </CreateWorkspaceModal>
@@ -62,11 +63,11 @@ export function Sidebar() {
                   className={cn(
                     "flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors",
                     activeWorkspaceId === ws.id
-                      ? "bg-indigo-50 text-indigo-700 font-medium"
-                      : "text-gray-600 hover:bg-gray-100"
+                      ? "bg-indigo-50 text-indigo-700 font-medium dark:bg-indigo-950 dark:text-indigo-300"
+                      : "text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
                   )}
                 >
-                  <span className="flex h-5 w-5 items-center justify-center rounded bg-indigo-100 text-[10px] font-bold text-indigo-600 uppercase">
+                  <span className="flex h-5 w-5 items-center justify-center rounded bg-indigo-100 text-[10px] font-bold text-indigo-600 uppercase dark:bg-indigo-900 dark:text-indigo-300">
                     {ws.name[0]}
                   </span>
                   <span className="truncate">{ws.name}</span>
@@ -80,7 +81,7 @@ export function Sidebar() {
         {activeWorkspaceId && (
           <section>
             <div className="mb-1 px-1">
-              <span className="text-[11px] font-medium uppercase tracking-widest text-gray-400">
+              <span className="text-[11px] font-medium uppercase tracking-widest text-gray-400 dark:text-gray-500">
                 Projects
               </span>
             </div>
@@ -102,8 +103,8 @@ export function Sidebar() {
                       className={cn(
                         "flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors",
                         isActive
-                          ? "bg-gray-100 text-gray-900 font-medium"
-                          : "text-gray-600 hover:bg-gray-50"
+                          ? "bg-gray-100 text-gray-900 font-medium dark:bg-gray-800 dark:text-gray-100"
+                          : "text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800"
                       )}
                     >
                       <span
@@ -127,8 +128,8 @@ export function Sidebar() {
             className={cn(
               "mb-1 flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors",
               pathname === `/dashboard/${activeWorkspaceId}/settings/members`
-                ? "bg-gray-100 text-gray-900 font-medium"
-                : "text-gray-600 hover:bg-gray-50"
+                ? "bg-gray-100 text-gray-900 font-medium dark:bg-gray-800 dark:text-gray-100"
+                : "text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800"
             )}
           >
             <Users className="h-4 w-4 flex-shrink-0" />
@@ -139,8 +140,8 @@ export function Sidebar() {
             className={cn(
               "flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors",
               pathname === `/dashboard/${activeWorkspaceId}/settings/billing`
-                ? "bg-gray-100 text-gray-900 font-medium"
-                : "text-gray-600 hover:bg-gray-50"
+                ? "bg-gray-100 text-gray-900 font-medium dark:bg-gray-800 dark:text-gray-100"
+                : "text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800"
             )}
           >
             <CreditCard className="h-4 w-4 flex-shrink-0" />
@@ -150,7 +151,7 @@ export function Sidebar() {
       )}
 
       {/* User footer */}
-      <div className="border-t border-gray-200 p-3">
+      <div className="border-t border-gray-200 p-3 dark:border-gray-700">
         <div className="flex items-center gap-2">
           <Avatar className="h-7 w-7">
             <AvatarImage src={user?.imageUrl} />
@@ -159,17 +160,18 @@ export function Sidebar() {
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 overflow-hidden">
-            <p className="truncate text-xs font-medium text-gray-800">
+            <p className="truncate text-xs font-medium text-gray-800 dark:text-gray-100">
               {user?.fullName}
             </p>
-            <p className="truncate text-[11px] text-gray-400">
+            <p className="truncate text-[11px] text-gray-400 dark:text-gray-500">
               {user?.primaryEmailAddress?.emailAddress}
             </p>
           </div>
+          <ThemeToggle />
           <Button
             variant="ghost"
             size="icon"
-            className="h-7 w-7 text-gray-400 hover:text-gray-600"
+            className="h-7 w-7 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
             onClick={() => signOut({ redirectUrl: "/" })}
           >
             <LogOut className="h-3.5 w-3.5" />

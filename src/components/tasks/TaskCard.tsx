@@ -58,8 +58,8 @@ export function TaskCard({ task, isDragOverlay = false }: Props) {
           }
         }}
         className={cn(
-          "group cursor-pointer rounded-lg border border-gray-200 bg-white p-3 shadow-sm",
-          "hover:border-indigo-200 hover:shadow-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500",
+          "group cursor-pointer rounded-lg border border-gray-200 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-800",
+          "hover:border-indigo-200 hover:shadow-md transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 dark:hover:border-indigo-700",
           isDragging && "opacity-40 shadow-lg",
           isDragOverlay && "shadow-xl"
         )}
@@ -80,8 +80,8 @@ export function TaskCard({ task, isDragOverlay = false }: Props) {
 
         {/* Title */}
         <p className={cn(
-          "text-sm font-medium text-gray-800 leading-snug",
-          task.status === "DONE" && "line-through text-gray-400"
+          "text-sm font-medium text-gray-800 leading-snug dark:text-gray-200",
+          task.status === "DONE" && "line-through text-gray-400 dark:text-gray-500"
         )}>
           {task.title}
         </p>
@@ -91,7 +91,7 @@ export function TaskCard({ task, isDragOverlay = false }: Props) {
           {task.dueDate ? (
             <span className={cn(
               "flex items-center gap-1 text-[11px]",
-              isOverdue ? "text-red-500" : "text-gray-400"
+              isOverdue ? "text-red-500" : "text-gray-400 dark:text-gray-500"
             )}>
               <CalendarDays className="h-3 w-3" />
               {new Date(task.dueDate).toLocaleDateString("en-US", {
