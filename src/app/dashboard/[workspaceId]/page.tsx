@@ -22,7 +22,7 @@ export default function WorkspacePage() {
           </p>
         </div>
         <CreateProjectModal workspaceId={workspaceId}>
-          <Button asChild size="sm" className="gap-1.5">
+          <Button size="sm" className="gap-1.5">
             <Plus className="h-4 w-4" />
             New project
           </Button>
@@ -40,7 +40,7 @@ export default function WorkspacePage() {
           <p className="text-sm font-medium text-gray-500 dark:text-gray-400">No projects yet</p>
           <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">Create your first project to get started</p>
           <CreateProjectModal workspaceId={workspaceId}>
-            <Button asChild variant="outline" size="sm" className="mt-4 gap-1.5">
+            <Button variant="outline" size="sm" className="mt-4 gap-1.5">
               <Plus className="h-4 w-4" />
               New project
             </Button>

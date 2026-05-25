@@ -64,7 +64,7 @@ export default function AcceptInvitationClient() {
             Invalid invitation link.
           </p>
 
-          <Button asChild variant="outline" className="mt-4 w-full">
+          <Button variant="outline" className="mt-4 w-full">
             <Link href="/dashboard">Back to dashboard</Link>
           </Button>
         </div>
@@ -88,7 +88,7 @@ export default function AcceptInvitationClient() {
               <span className="font-medium">{workspace.name}</span>.
             </p>
 
-            <Button asChild className="mt-4 w-full">
+            <Button className="mt-4 w-full">
               <Link href={`/dashboard/${workspace.id}`}>
                 Open workspace
               </Link>
@@ -105,7 +105,7 @@ export default function AcceptInvitationClient() {
                 "This invitation link is invalid or expired."}
             </p>
 
-            <Button asChild variant="outline" className="mt-4 w-full">
+            <Button variant="outline" className="mt-4 w-full">
               <Link href="/dashboard">Back to dashboard</Link>
             </Button>
           </>

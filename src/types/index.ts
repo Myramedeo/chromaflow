@@ -50,6 +50,7 @@ export interface Project {
   description: string | null;
   status: ProjectStatus;
   color: string;
+  backgroundImageUrl: string | null;
   createdAt: string;
   _count: { tasks: number };
 }

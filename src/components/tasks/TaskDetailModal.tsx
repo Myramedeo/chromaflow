@@ -185,7 +185,7 @@ export function TaskDetailModal({ task, open, onClose }: Props) {
           <textarea
             className={cn(
               "w-full resize-none rounded-md border-0 bg-transparent px-0",
-              "text-xl font-semibold text-gray-900 placeholder:text-gray-300",
+              "text-xl font-semibold text-gray-900 dark:text-gray-100 placeholder:text-gray-300 dark:placeholder:text-gray-500",
               "focus:outline-none focus:ring-0 leading-snug"
             )}
             rows={2}
