@@ -39,7 +39,7 @@ export function KanbanColumn({ column, tasks, onAddTask }: Props) {
   }
 
   return (
-    <div className="flex w-72 flex-shrink-0 flex-col rounded-xl bg-gray-50 border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+    <div className="flex w-72 flex-shrink-0 self-start flex-col rounded-xl bg-gray-50 border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
       {/* Header */}
       <div className="flex items-center gap-2 px-3 py-3">
         <span
@@ -56,7 +56,7 @@ export function KanbanColumn({ column, tasks, onAddTask }: Props) {
       <div
         ref={setNodeRef}
         className={cn(
-          "flex-1 min-h-[60px] px-2 space-y-2 transition-colors",
+          "min-h-[30px] px-2 space-y-2 transition-colors",
           isOver && "bg-indigo-50/60 rounded-b-xl dark:bg-indigo-950/40"
         )}
       >

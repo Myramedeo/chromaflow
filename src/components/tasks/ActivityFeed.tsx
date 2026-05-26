@@ -89,7 +89,7 @@ export function ActivityFeed({ workspaceId, projectId }: Props) {
 
       {/* Feed */}
       {open && (
-        <div className="flex-1 overflow-y-auto px-3 py-1">
+        <div className="flex-1 overflow-y-auto scrollbar-hidden px-3 py-1">
           {isLoading ? (
             <div className="space-y-3 pt-2">
               {[1, 2, 3, 4].map((i) => (

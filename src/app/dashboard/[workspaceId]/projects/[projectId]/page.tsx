@@ -136,16 +136,24 @@ export default function ProjectPage() {
         </div>
         </div>
 
-        {/* Board — fills remaining height, scrolls horizontally */}
-        <div className="flex flex-1 overflow-hidden">
-          <div className="flex-1 overflow-hidden">
-            <KanbanBoard 
-              workspaceId={workspaceId} 
-              projectId={projectId} 
-              onActiveUsersChange={handleActiveUsersChange}
-            />
+        {/* Board area */}
+        <div className="flex flex-1 min-h-0 overflow-hidden">
+          {/* Scrollable kanban section */}
+          <div className="flex-1 overflow-x-auto overflow-y-hidden">
+            <div className="w-max">
+              <KanbanBoard
+                workspaceId={workspaceId}
+                projectId={projectId}
+                onActiveUsersChange={handleActiveUsersChange}
+              />
+            </div>
           </div>
-          <ActivityFeed workspaceId={workspaceId} projectId={projectId} />
+
+          {/* Fixed sidebar */}
+          <ActivityFeed
+            workspaceId={workspaceId}
+            projectId={projectId}
+          />
         </div>
       </div>
     </div>
