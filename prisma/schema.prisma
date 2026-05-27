@@ -142,6 +142,7 @@ model Task {
   priority    TaskPriority @default(MEDIUM)
   position    Float        @default(0)     // used for drag-and-drop ordering
   dueDate     DateTime?
+  imageUrl    String?
   assigneeId  String?
   creatorId   String
   notificationSentAt DateTime?            // tracks if due date notification was sent

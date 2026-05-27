@@ -64,6 +64,7 @@ export interface Task {
   priority: TaskPriority;
   position: number;
   dueDate: string | null;
+  imageUrl: string | null;
   assigneeId: string | null;
   creatorId: string;
   createdAt: string;

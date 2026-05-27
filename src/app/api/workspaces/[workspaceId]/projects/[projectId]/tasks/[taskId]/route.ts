@@ -17,6 +17,7 @@ import { sendAssignmentNotificationEmail } from "@/lib/email";
 interface UpdateTaskBody {
   title?: string;
   description?: string;
+  imageUrl?: string | null;
   status?: "TODO" | "IN_PROGRESS" | "IN_REVIEW" | "DONE";
   priority?: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
   position?: number;
@@ -52,6 +53,7 @@ export const PATCH = withAuth(async (req, { userId, params }) => {
     data: {
       ...(body.title !== undefined && { title: body.title }),
       ...(body.description !== undefined && { description: body.description }),
+      ...(body.imageUrl !== undefined && { imageUrl: body.imageUrl }),
       ...(body.status !== undefined && { status: body.status }),
       ...(body.priority !== undefined && { priority: body.priority }),
       ...(body.position !== undefined && { position: body.position }),

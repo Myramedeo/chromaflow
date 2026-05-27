@@ -6,6 +6,7 @@ import { useApiFetcher } from "@/lib/api-client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { useTasks } from "@/hooks/useTasks";
@@ -42,6 +43,7 @@ export function TaskDetailModal({ task, open, onClose }: Props) {
   // Local state mirrors the task so fields feel instant
   const [title, setTitle] = useState(task.title);
   const [description, setDescription] = useState(task.description ?? "");
+  const [imageUrl, setImageUrl] = useState(task.imageUrl ?? "");
   const [assigneeId, setAssigneeId] = useState(task.assigneeId ?? "");
   const [newComment, setNewComment] = useState("");
   const [newSubtask, setNewSubtask] = useState("");
@@ -119,6 +121,16 @@ export function TaskDetailModal({ task, open, onClose }: Props) {
       await updateTask(task.id, { dueDate });
     } catch {
       toast.error("Failed to update due date");
+    }
+  }
+
+  async function handleImageUrlBlur() {
+    const val = imageUrl.trim() || null;
+    if (val === task.imageUrl) return;
+    try {
+      await updateTask(task.id, { imageUrl: val });
+    } catch {
+      toast.error("Failed to update image URL");
     }
   }
 
@@ -285,6 +297,26 @@ export function TaskDetailModal({ task, open, onClose }: Props) {
               defaultValue={task.dueDate ? task.dueDate.substring(0, 10) : ""}
               onChange={handleDueDateChange}
             />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label className="text-xs text-gray-500">Image URL</Label>
+            <Input
+              value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
+              onBlur={handleImageUrlBlur}
+              placeholder="https://example.com/task-image.jpg"
+            />
+            {imageUrl && (
+              <div className="overflow-hidden rounded-md border border-gray-200">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={imageUrl}
+                  alt="Task image preview"
+                  className="h-40 w-full object-cover"
+                />
+              </div>
+            )}
           </div>
 
           {/* Description */}

@@ -65,6 +65,17 @@ export function TaskCard({ task, isDragOverlay = false }: Props) {
         )}
         aria-label={`Open task ${task.title}`}
       >
+        {task.imageUrl && (
+          <div className="-mx-3 -mt-3 mb-3 overflow-hidden rounded-t-lg bg-gray-100 dark:bg-gray-900">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={task.imageUrl}
+              alt={task.title}
+              className="h-36 w-full object-cover"
+            />
+          </div>
+        )}
+
         {/* Priority indicator */}
         <div className="mb-2 flex items-center justify-between gap-2">
           <span
