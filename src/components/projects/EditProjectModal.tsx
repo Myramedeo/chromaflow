@@ -19,9 +19,11 @@ const COLOR_OPTIONS = [
 export function EditProjectModal({
   workspaceId,
   project,
+  trigger,
 }: {
   workspaceId: string;
   project: Project;
+  trigger?: React.ReactNode;
 }) {
   const [open, setOpen]              = useState(false);
   const [name, setName]              = useState(project.name);
@@ -64,13 +66,13 @@ export function EditProjectModal({
       setOpen(isOpen);
       if (!isOpen) reset();
     }}>
-      <DialogTrigger
-        render={
-          <Button variant="ghost" size="sm" className="gap-1.5" />
-        }
-      >
-        <Pencil className="h-3.5 w-3.5" />
-        Edit
+      <DialogTrigger>
+        {trigger ?? (
+          <Button variant="ghost" size="sm" className="gap-1.5">
+            <Pencil className="h-3.5 w-3.5 text-gray-900 dark:text-white" />
+            Edit
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
