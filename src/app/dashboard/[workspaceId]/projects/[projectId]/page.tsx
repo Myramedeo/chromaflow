@@ -65,7 +65,7 @@ export default function ProjectPage() {
           {project?.backgroundImageUrl && (
             <div className="absolute inset-0 bg-black/30 pointer-events-none" />
           )}
-          <div className="flex items-center gap-3 border-b border-gray-200 bg-white/95 px-6 py-4 dark:border-gray-700 dark:bg-gray-800/95 relative z-20">
+          <div className="flex items-center gap-3 border-b border-gray-200 bg-white px-6 py-4 dark:border-gray-700 dark:bg-gray-800/95 relative z-20">
           {isLoading ? (
             <Skeleton className="h-5 w-48" />
           ) : (

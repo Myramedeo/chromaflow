@@ -7,7 +7,7 @@ import { TaskDetailModal } from "./TaskDetailModal";
 import type { Task } from "@/types";
 import { PRIORITY_CONFIG } from "@/types";
 import { cn } from "@/lib/utils";
-import { CalendarDays } from "lucide-react";
+import { CalendarDays, CheckSquare } from "lucide-react";
 
 interface Props {
   task: Task;
@@ -35,6 +35,11 @@ export function TaskCard({ task, isDragOverlay = false }: Props) {
 
   const isOverdue =
     task.dueDate && new Date(task.dueDate) < new Date() && task.status !== "DONE";
+
+  const completedSubtasks =
+  task.subtasks?.filter((subtask) => subtask.completed).length ?? 0;
+
+  const totalSubtasks = task.subtasks?.length ?? 0;
 
   return (
     <>
@@ -99,20 +104,29 @@ export function TaskCard({ task, isDragOverlay = false }: Props) {
 
         {/* Footer */}
         <div className="mt-2.5 flex items-center justify-between gap-2">
-          {task.dueDate ? (
-            <span className={cn(
-              "flex items-center gap-1 text-[11px]",
-              isOverdue ? "text-red-500" : "text-gray-400 dark:text-gray-500"
-            )}>
-              <CalendarDays className="h-3 w-3" />
-              {new Date(task.dueDate).toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-              })}
-            </span>
-          ) : (
-            <span />
-          )}
+          <div className="flex items-center gap-3">
+            {task.dueDate && (
+              <span
+                className={cn(
+                  "flex items-center gap-1 text-[11px]",
+                  isOverdue ? "text-red-500" : "text-gray-400 dark:text-gray-500"
+                )}
+              >
+                <CalendarDays className="h-3 w-3" />
+                {new Date(task.dueDate).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                })}
+              </span>
+            )}
+
+            {totalSubtasks > 0 && (
+              <span className="flex items-center gap-1 text-[11px] text-gray-400 dark:text-gray-500">
+                <CheckSquare className="h-3 w-3" />
+                {completedSubtasks}/{totalSubtasks}
+              </span>
+            )}
+          </div>
 
           {task.assignee && (
             <>
