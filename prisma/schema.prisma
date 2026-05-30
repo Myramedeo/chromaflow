@@ -107,14 +107,15 @@ model WorkspaceInvitation {
 // Project — a collection of tasks
 // ─────────────────────────────────────────────
 model Project {
-  id          String        @id @default(cuid())
-  workspaceId String
-  name        String
-  description String?
-  status      ProjectStatus @default(ACTIVE)
-  color       String        @default("#6366f1") // hex color for UI
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  id                  String        @id @default(cuid())
+  workspaceId         String
+  name                String
+  description         String?
+  status              ProjectStatus @default(ACTIVE)
+  color               String        @default("#6366f1") // hex color for UI
+  backgroundImageUrl  String?                           // URL to background image
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
 
   workspace    Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   tasks        Task[]
@@ -141,6 +142,7 @@ model Task {
   priority    TaskPriority @default(MEDIUM)
   position    Float        @default(0)     // used for drag-and-drop ordering
   dueDate     DateTime?
+  imageUrl    String?
   assigneeId  String?
   creatorId   String
   notificationSentAt DateTime?            // tracks if due date notification was sent

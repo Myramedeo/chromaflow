@@ -56,7 +56,7 @@ export default function WorkspaceSearchCommand() {
           setProjects([]);
           setTasks([]);
         }
-      } catch (err) {
+      } catch (_) {
         setProjects([]);
         setTasks([]);
       } finally {

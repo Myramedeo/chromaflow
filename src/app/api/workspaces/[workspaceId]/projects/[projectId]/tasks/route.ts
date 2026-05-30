@@ -31,6 +31,7 @@ export const GET = withAuth(async (_req, { userId, params }) => {
     include: {
       assignee: { select: { id: true, name: true, avatarUrl: true } },
       creator:  { select: { id: true, name: true } },
+      subtasks: { select: { id: true, title: true, completed: true } },
     },
     orderBy: [{ status: "asc" }, { position: "asc" }],
   });
@@ -41,6 +42,7 @@ export const GET = withAuth(async (_req, { userId, params }) => {
 interface CreateTaskBody {
   title: string;
   description?: string;
+  imageUrl?: string;
   status?: "TODO" | "IN_PROGRESS" | "IN_REVIEW" | "DONE";
   priority?: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
   dueDate?: string;
@@ -77,6 +79,7 @@ export const POST = withAuth(async (req, { userId, params }) => {
       projectId,
       title: body.title,
       description: body.description ?? null,
+      imageUrl: body.imageUrl ?? null,
       status,
       priority: body.priority ?? "MEDIUM",
       position,

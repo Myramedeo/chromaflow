@@ -13,7 +13,7 @@ interface Props {
 export function ProjectCard({ project, workspaceId }: Props) {
   return (
     <Link href={`/dashboard/${workspaceId}/projects/${project.id}`}>
-      <div className="group relative flex h-36 flex-col justify-between overflow-hidden rounded-xl border border-gray-200 bg-white p-5 transition-shadow hover:shadow-md">
+      <div className="group relative flex h-36 flex-col justify-between overflow-hidden rounded-xl border border-gray-200 bg-white p-5 transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800">
         {/* Color accent bar */}
         <span
           className="absolute left-0 top-0 h-full w-1 rounded-l-xl"
@@ -22,13 +22,13 @@ export function ProjectCard({ project, workspaceId }: Props) {
 
         <div className="pl-2">
           <div className="flex items-start justify-between gap-2">
-            <h3 className="font-medium text-gray-900 leading-snug group-hover:text-indigo-600 transition-colors line-clamp-2">
+            <h3 className="font-medium text-gray-900 leading-snug group-hover:text-indigo-600 transition-colors line-clamp-2 dark:text-white dark:group-hover:text-indigo-400">
               {project.name}
             </h3>
-            <LayoutGrid className="h-4 w-4 flex-shrink-0 text-gray-300 group-hover:text-indigo-400 transition-colors" />
+            <LayoutGrid className="h-4 w-4 flex-shrink-0 text-gray-300 group-hover:text-indigo-400 transition-colors dark:text-gray-600 dark:group-hover:text-indigo-400" />
           </div>
           {project.description && (
-            <p className="mt-1 text-xs text-gray-400 line-clamp-2">
+            <p className="mt-1 text-xs text-gray-400 line-clamp-2 dark:text-gray-500">
               {project.description}
             </p>
           )}

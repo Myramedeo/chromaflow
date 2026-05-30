@@ -128,3 +128,13 @@
     @apply font-sans;
   }
 }
+
+/* Hide scrollbar but preserve scrolling */
+.scrollbar-hidden {
+  -ms-overflow-style: none;  /* IE + Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;             /* Chrome, Safari */
+}

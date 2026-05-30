@@ -50,6 +50,7 @@ export interface Project {
   description: string | null;
   status: ProjectStatus;
   color: string;
+  backgroundImageUrl: string | null;
   createdAt: string;
   _count: { tasks: number };
 }
@@ -63,6 +64,7 @@ export interface Task {
   priority: TaskPriority;
   position: number;
   dueDate: string | null;
+  imageUrl: string | null;
   assigneeId: string | null;
   creatorId: string;
   createdAt: string;

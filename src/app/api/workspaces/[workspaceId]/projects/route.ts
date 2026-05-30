@@ -41,6 +41,7 @@ interface CreateProjectBody {
   name: string;
   description?: string;
   color?: string;
+  backgroundImageUrl?: string;
 }
 
 export const POST = withAuth(async (req, { userId, params }) => {
@@ -87,6 +88,7 @@ export const POST = withAuth(async (req, { userId, params }) => {
       name: body.name,
       description: body.description ?? null,
       color: body.color ?? "#6366f1",
+      backgroundImageUrl: body.backgroundImageUrl ?? null,
     },
   });
 

@@ -215,7 +215,7 @@ export function KanbanBoard({ workspaceId, projectId, onActiveUsersChange }: Pro
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <div className="flex gap-4 overflow-x-auto p-6 pb-8">
+        <div className="flex gap-4 w-max p-6 pb-8">
           {KANBAN_COLUMNS.map((col) => (
             <KanbanColumn
               key={col.id}

@@ -39,15 +39,15 @@ export function KanbanColumn({ column, tasks, onAddTask }: Props) {
   }
 
   return (
-    <div className="flex w-72 flex-shrink-0 flex-col rounded-xl bg-gray-50 border border-gray-200">
+    <div className="flex w-72 flex-shrink-0 self-start flex-col rounded-xl bg-gray-50 border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
       {/* Header */}
       <div className="flex items-center gap-2 px-3 py-3">
         <span
           className="h-2 w-2 rounded-full flex-shrink-0"
           style={{ backgroundColor: column.color }}
         />
-        <span className="text-sm font-medium text-gray-700">{column.label}</span>
-        <span className="ml-auto rounded-full bg-gray-200 px-2 py-0.5 text-[11px] font-medium text-gray-500">
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{column.label}</span>
+        <span className="ml-auto rounded-full bg-gray-200 px-2 py-0.5 text-[11px] font-medium text-gray-500 dark:bg-gray-700 dark:text-gray-400">
           {tasks.length}
         </span>
       </div>
@@ -56,8 +56,8 @@ export function KanbanColumn({ column, tasks, onAddTask }: Props) {
       <div
         ref={setNodeRef}
         className={cn(
-          "flex-1 min-h-[60px] px-2 space-y-2 transition-colors",
-          isOver && "bg-indigo-50/60 rounded-b-xl"
+          "min-h-[30px] px-2 space-y-2 transition-colors",
+          isOver && "bg-indigo-50/60 rounded-b-xl dark:bg-indigo-950/40"
         )}
       >
         <SortableContext items={tasks.map((t) => t.id)} strategy={verticalListSortingStrategy}>
@@ -70,11 +70,11 @@ export function KanbanColumn({ column, tasks, onAddTask }: Props) {
       {/* Add task input */}
       <div className="p-2">
         {isAdding ? (
-          <div className="rounded-lg border border-indigo-200 bg-white p-2 shadow-sm">
+          <div className="rounded-lg border border-indigo-200 bg-white p-2 shadow-sm dark:border-indigo-900 dark:bg-gray-700">
             <input
               ref={inputRef}
               autoFocus
-              className="w-full text-sm outline-none placeholder:text-gray-400"
+              className="w-full text-sm outline-none placeholder:text-gray-400 dark:bg-gray-700 dark:text-white dark:placeholder:text-gray-500"
               placeholder="Task title…"
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
@@ -85,7 +85,7 @@ export function KanbanColumn({ column, tasks, onAddTask }: Props) {
         ) : (
           <button
             onClick={() => { setIsAdding(true); setTimeout(() => inputRef.current?.focus(), 50); }}
-            className="flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
+            className="flex w-full items-center gap-1.5 rounded-lg px-2 py-1.5 text-xs text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors dark:text-gray-500 dark:hover:bg-gray-700 dark:hover:text-gray-300"
           >
             <Plus className="h-3.5 w-3.5" />
             Add task

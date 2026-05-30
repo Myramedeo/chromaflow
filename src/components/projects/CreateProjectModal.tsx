@@ -25,15 +25,16 @@ export function CreateProjectModal({
   workspaceId: string;
   children: React.ReactNode;
 }) {
-  const [open, setOpen]         = useState(false);
-  const [limitHit, setLimitHit] = useState(false);
-  const [name, setName]         = useState("");
-  const [description, setDesc]  = useState("");
-  const [color, setColor]       = useState(COLOR_OPTIONS[0]);
-  const [loading, setLoading]   = useState(false);
-  const { createProject }       = useProjects(workspaceId);
-  const mutate                  = useApiMutation();
-  const router                  = useRouter();
+  const [open, setOpen]              = useState(false);
+  const [limitHit, setLimitHit]      = useState(false);
+  const [name, setName]              = useState("");
+  const [description, setDesc]       = useState("");
+  const [color, setColor]            = useState(COLOR_OPTIONS[0]);
+  const [backgroundImageUrl, setBgImageUrl] = useState("");
+  const [loading, setLoading]        = useState(false);
+  const { createProject }            = useProjects(workspaceId);
+  const mutate                       = useApiMutation();
+  const router                       = useRouter();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -44,6 +45,7 @@ export function CreateProjectModal({
         name: name.trim(),
         description: description.trim() || undefined,
         color,
+        backgroundImageUrl: backgroundImageUrl.trim() || undefined,
       });
       toast.success(`Project "${project.name}" created`);
       setOpen(false);
@@ -62,7 +64,11 @@ export function CreateProjectModal({
   }
 
   function reset() {
-    setName(""); setDesc(""); setColor(COLOR_OPTIONS[0]); setLimitHit(false);
+    setName(""); 
+    setDesc(""); 
+    setColor(COLOR_OPTIONS[0]); 
+    setBgImageUrl("");
+    setLimitHit(false);
   }
 
   async function handleUpgrade() {
@@ -153,6 +159,15 @@ export function CreateProjectModal({
                   />
                 ))}
               </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="bg-image">Background Image URL (optional)</Label>
+              <Input
+                id="bg-image"
+                placeholder="https://example.com/image.jpg"
+                value={backgroundImageUrl}
+                onChange={(e) => setBgImageUrl(e.target.value)}
+              />
             </div>
             <div className="flex justify-end gap-2 pt-2">
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>

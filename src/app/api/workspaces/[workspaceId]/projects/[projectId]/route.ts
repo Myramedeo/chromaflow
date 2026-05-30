@@ -56,6 +56,7 @@ interface UpdateProjectBody {
   name?: string;
   description?: string;
   color?: string;
+  backgroundImageUrl?: string;
   status?: "ACTIVE" | "COMPLETED" | "ARCHIVED";
   [key: string]: unknown;
 }
@@ -76,6 +77,7 @@ export const PATCH = withAuth(async (req, { userId, params }) => {
       ...(body.name !== undefined && { name: body.name }),
       ...(body.description !== undefined && { description: body.description }),
       ...(body.color !== undefined && { color: body.color }),
+      ...(body.backgroundImageUrl !== undefined && { backgroundImageUrl: body.backgroundImageUrl }),
       ...(body.status !== undefined && { status: body.status }),
     },
   });

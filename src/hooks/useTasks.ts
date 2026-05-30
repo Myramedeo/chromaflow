@@ -16,6 +16,7 @@ export function useTasks(workspaceId: string, projectId: string) {
     title: string;
     status?: TaskStatus;
     assigneeId?: string | null;
+    imageUrl?: string;
   }) {
     const task = await mutator<Task>(`${base}/tasks`, "POST", payload);
     await mutate();
@@ -27,6 +28,7 @@ export function useTasks(workspaceId: string, projectId: string) {
     payload: Partial<{
       title: string;
       description: string | null;
+      imageUrl: string | null;
       status: TaskStatus;
       priority: TaskPriority;
       position: number;

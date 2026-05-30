@@ -13,6 +13,7 @@ export function useProjects(workspaceId: string | null) {
     name: string;
     description?: string;
     color?: string;
+    backgroundImageUrl?: string;
   }) {
     if (!workspaceId) throw new Error("No workspaceId");
     const project = await mutator<Project>(
@@ -24,11 +25,28 @@ export function useProjects(workspaceId: string | null) {
     return project;
   }
 
+  async function updateProject(projectId: string, payload: {
+    name?: string;
+    description?: string;
+    color?: string;
+    backgroundImageUrl?: string;
+  }) {
+    if (!workspaceId) throw new Error("No workspaceId");
+    const project = await mutator<Project>(
+      `/api/workspaces/${workspaceId}/projects/${projectId}`,
+      "PATCH",
+      payload
+    );
+    await mutate();
+    return project;
+  }
+
   return {
     projects: data ?? [],
     isLoading,
     error,
     createProject,
+    updateProject,
     mutate,
   };
 }
