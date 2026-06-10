@@ -1,5 +1,6 @@
-// GET   /api/workspaces/[workspaceId]  — get workspace + members
-// PATCH /api/workspaces/[workspaceId]  — update name/slug (OWNER/ADMIN only)
+// GET    /api/workspaces/[workspaceId]  — get workspace + members
+// PATCH  /api/workspaces/[workspaceId]  — update name/slug (OWNER/ADMIN only)
+// DELETE /api/workspaces/[workspaceId]  — hard-delete workspace (OWNER only)
 
 import { db } from "@/lib/db";
 import {
@@ -11,6 +12,8 @@ import {
   getWorkspaceMembership,
   parseBody,
 } from "@/lib/api-helpers";
+import { logActivity, ACTIONS } from "@/lib/activity";
+import { stripe } from "@/lib/stripe";
 
 export const GET = withAuth(async (_req, { userId, params }) => {
   const { workspaceId } = params;
@@ -65,4 +68,55 @@ export const PATCH = withAuth(async (req, { userId, params }) => {
   });
 
   return ok(workspace);
+});
+
+interface DeleteWorkspaceBody {
+  confirmName: string;
+}
+
+export const DELETE = withAuth(async (req, { userId, params }) => {
+  const { workspaceId } = params;
+
+  const membership = await getWorkspaceMembership(userId, workspaceId);
+  if (!membership) return forbidden();
+
+  if (membership.role !== "OWNER") {
+    return forbidden();
+  }
+
+  const body = await parseBody<DeleteWorkspaceBody>(req);
+  if (!body?.confirmName) {
+    return error("confirmName is required");
+  }
+
+  const workspace = await db.workspace.findUnique({
+    where: { id: workspaceId },
+    include: { subscription: true },
+  });
+
+  if (!workspace) return notFound("Workspace");
+
+  if (body.confirmName !== workspace.name) {
+    return error("Confirmation name does not match workspace name");
+  }
+
+  const stripeSubscriptionId = workspace.subscription?.stripeSubscriptionId;
+  if (stripeSubscriptionId) {
+    try {
+      await stripe.subscriptions.cancel(stripeSubscriptionId);
+    } catch (err) {
+      // Allow delete even if subscription is already cancelled in Stripe
+      console.error("[workspace] Failed to cancel Stripe subscription:", err);
+    }
+  }
+
+  await logActivity({
+    userId,
+    action: ACTIONS.DELETED_WORKSPACE,
+    metadata: { workspaceId: workspace.id, name: workspace.name },
+  });
+
+  await db.workspace.delete({ where: { id: workspaceId } });
+
+  return ok({ deleted: true });
 });

@@ -41,12 +41,22 @@ export function useProjects(workspaceId: string | null) {
     return project;
   }
 
+  async function deleteProject(projectId: string) {
+    if (!workspaceId) throw new Error("No workspaceId");
+    await mutator(
+      `/api/workspaces/${workspaceId}/projects/${projectId}`,
+      "DELETE"
+    );
+    await mutate();
+  }
+
   return {
     projects: data ?? [],
     isLoading,
     error,
     createProject,
     updateProject,
+    deleteProject,
     mutate,
   };
 }

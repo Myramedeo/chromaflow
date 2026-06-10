@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useProjects } from "@/hooks/useProjects";
+import { useWorkspaces } from "@/hooks/useWorkspaces";
 import { KanbanBoard } from "@/components/tasks/KanbanBoard";
 import { ActiveUsers } from "@/components/tasks/ActiveUsers";
 import { ActivityFeed } from "@/components/tasks/ActivityFeed";
@@ -21,30 +22,46 @@ export default function ProjectPage() {
     projectId: string;
   }>();
 
-  const { projects, isLoading } = useProjects(workspaceId);
+  const router = useRouter();
+  const { workspaces } = useWorkspaces();
+  const { projects, isLoading, deleteProject } = useProjects(workspaceId);
   const project = projects.find((p) => p.id === projectId);
   const [activeUsers, setActiveUsers] = useState<PresenceUser[]>([]);
+
+  const role = workspaces.find((w) => w.id === workspaceId)?.role;
+  const canDelete = role === "OWNER" || role === "ADMIN";
 
   const handleActiveUsersChange = useCallback((users: PresenceUser[]) => {
     setActiveUsers(users);
   }, []);
 
   const handleExport = async (format: ExportFormat) => {
-  if (!project) return;
+    if (!project) return;
 
-  try {
-    await exportTasks(
-      workspaceId,
-      projectId,
-      project.name,
-      format
-    );
+    try {
+      await exportTasks(
+        workspaceId,
+        projectId,
+        project.name,
+        format
+      );
 
-    toast.success(`Tasks exported to ${format.toUpperCase()}`);
-  } catch {
-    toast.error("Failed to export tasks");
-  }
-};
+      toast.success(`Tasks exported to ${format.toUpperCase()}`);
+    } catch {
+      toast.error("Failed to export tasks");
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      await deleteProject(projectId);
+      toast.success(`Project "${project?.name ?? "Project"}" deleted`);
+      router.push(`/dashboard/${workspaceId}`);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Failed to delete project");
+      throw err;
+    }
+  };
 
   return (
     <div 
@@ -113,6 +130,8 @@ export default function ProjectPage() {
                 projectId={projectId}
                 projectName={project?.name ?? ""}
                 onExport={handleExport}
+                onDelete={handleDelete}
+                canDelete={canDelete}
                 disabled={!project}
               />
 
