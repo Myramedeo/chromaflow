@@ -12,7 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { LogOut, Plus, FolderKanban } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Users, CreditCard } from "lucide-react"
+import { Settings } from "lucide-react";
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -124,28 +124,16 @@ export function Sidebar() {
       {activeWorkspaceId && (
         <div className="px-3 pb-3">
           <Link
-            href={`/dashboard/${activeWorkspaceId}/settings/members`}
-            className={cn(
-              "mb-1 flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors",
-              pathname === `/dashboard/${activeWorkspaceId}/settings/members`
-                ? "bg-gray-100 text-gray-900 font-medium dark:bg-gray-800 dark:text-gray-100"
-                : "text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800"
-            )}
-          >
-            <Users className="h-4 w-4 flex-shrink-0" />
-            <span>Members</span>
-          </Link>
-          <Link
-            href={`/dashboard/${activeWorkspaceId}/settings/billing`}
+            href={`/dashboard/${activeWorkspaceId}/settings/general`}
             className={cn(
               "flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors",
-              pathname === `/dashboard/${activeWorkspaceId}/settings/billing`
+              pathname.startsWith(`/dashboard/${activeWorkspaceId}/settings`)
                 ? "bg-gray-100 text-gray-900 font-medium dark:bg-gray-800 dark:text-gray-100"
                 : "text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-800"
             )}
           >
-            <CreditCard className="h-4 w-4 flex-shrink-0" />
-            <span>Billing</span>
+            <Settings className="h-4 w-4 flex-shrink-0" />
+            <span>Settings</span>
           </Link>
         </div>
       )}
