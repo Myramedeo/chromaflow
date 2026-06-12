@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
-import { Users, CreditCard } from "lucide-react";
+import { Users, CreditCard, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface SettingsLayoutProps {
@@ -14,6 +14,11 @@ export default function SettingsLayout({ children }: SettingsLayoutProps) {
   const pathname = usePathname();
 
   const tabs = [
+    {
+      href: `/dashboard/${workspaceId}/settings/general`,
+      label: "General",
+      icon: Settings,
+    },
     {
       href: `/dashboard/${workspaceId}/settings/members`,
       label: "Members",

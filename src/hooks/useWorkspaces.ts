@@ -16,12 +16,18 @@ export function useWorkspaces() {
     await mutate();
     return workspace;
   }
+
+  async function deleteWorkspace(workspaceId: string, confirmName: string) {
+    await mutator(`/api/workspaces/${workspaceId}`, "DELETE", { confirmName });
+    await mutate();
+  }
  
   return {
     workspaces: data ?? [],
     isLoading,
     error,
     createWorkspace,
+    deleteWorkspace,
     mutate,
   };
 }
