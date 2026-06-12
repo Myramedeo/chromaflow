@@ -61,7 +61,7 @@ export function ConfirmDeleteDialog({
           <div className="space-y-1.5">
             <Label htmlFor="confirm-delete-input">
               Type{" "}
-              <span className="font-medium">"{requireTypedConfirmation}"</span>
+              <span className="font-medium">&quot;{requireTypedConfirmation}&quot;</span>
               {" "}to confirm.
             </Label>
             <Input
