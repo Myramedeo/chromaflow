@@ -96,3 +96,7 @@ Every push and pull request runs two parallel GitHub Actions jobs.
 ## Roadmap
 
 - [ ] Public marketing landing page
+- [ ] Public-facing view options
+- [ ] Error monitoring via Sentry
+- [ ] Rate limiting on API (Upstash Redis)
+- [ ] Proper loading.tsx and error.tsx files
