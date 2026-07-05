@@ -1,6 +1,8 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import type { WorkspaceRole } from "@prisma/client";
+
+import * as Sentry from "@sentry/nextjs";
  
 // ── Response helpers ──────────────────────────────────────────────────────────
  
@@ -58,6 +60,9 @@ export function withAuth(handler: AuthedHandler) {
     if (!userId) {
       return unauthorized();
     }
+
+    // Tag all errors in this request with the user
+    Sentry.setUser({ id: userId });
 
     const params = await context.params;
     return handler(request, { params, userId });

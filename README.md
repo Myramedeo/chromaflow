@@ -99,4 +99,7 @@ Every push and pull request runs two parallel GitHub Actions jobs.
 - [ ] Public-facing view options
 - [ ] Error monitoring via Sentry
 - [ ] Rate limiting on API (Upstash Redis)
-- [ ] Proper loading.tsx and error.tsx files
+- [ ] Redis caching layer
+- [ ] End-to-end testing
+- [ ] Analytics page
+- [ ] AI assistant suggestions

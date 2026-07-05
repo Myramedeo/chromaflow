@@ -8,6 +8,7 @@ import { stripe } from "@/lib/stripe";
 import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
+import * as Sentry from "@sentry/nextjs";
 
 export async function POST(req: Request) {
   const body      = await req.text(); // raw body — required for signature verification
@@ -152,7 +153,9 @@ export async function POST(req: Request) {
         break;
     }
   } catch (err) {
-    console.error(`[webhook] Error handling ${event.type}:`, err);
+    Sentry.captureException(err, {
+      tags: { stripe_event: event.type },
+    });
     // Return 500 so Stripe retries the event
     return NextResponse.json({ error: "Webhook handler failed" }, { status: 500 });
   }
