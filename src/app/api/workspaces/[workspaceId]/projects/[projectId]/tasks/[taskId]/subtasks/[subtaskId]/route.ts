@@ -3,7 +3,7 @@
 
 import { db } from "@/lib/db";
 import {
-  withAuth,
+  withRateLimit,
   ok,
   error,
   forbidden,
@@ -11,6 +11,7 @@ import {
   getWorkspaceMembership,
   parseBody,
 } from "@/lib/api-helpers";
+import { writeLimiter } from "@/lib/rate-limit";
 
 interface UpdateSubtaskBody {
   title?: string;
@@ -19,7 +20,7 @@ interface UpdateSubtaskBody {
   [key: string]: unknown;
 }
 
-export const PATCH = withAuth(async (req, { userId, params }) => {
+export const PATCH = withRateLimit(writeLimiter, async (req, { userId, params }) => {
   const { workspaceId, projectId, taskId, subtaskId } = params;
 
   const membership = await getWorkspaceMembership(userId, workspaceId);
@@ -50,7 +51,7 @@ export const PATCH = withAuth(async (req, { userId, params }) => {
   return ok(updated);
 });
 
-export const DELETE = withAuth(async (_req, { userId, params }) => {
+export const DELETE = withRateLimit(writeLimiter, async (_req, { userId, params }) => {
   const { workspaceId, projectId, taskId, subtaskId } = params;
 
   const membership = await getWorkspaceMembership(userId, workspaceId);

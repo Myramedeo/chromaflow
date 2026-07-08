@@ -1,9 +1,10 @@
 // GET  — workspace-scoped search for projects and tasks
 
 import { db } from "@/lib/db";
-import { withAuth, ok, forbidden } from "@/lib/api-helpers";
+import { withRateLimit, ok, forbidden } from "@/lib/api-helpers";
+import { readLimiter } from "@/lib/rate-limit";
 
-export const GET = withAuth(async (req, { userId, params }) => {
+export const GET = withRateLimit(readLimiter, async (req, { userId, params }) => {
   const { workspaceId } = params;
   const url = new URL(req.url);
   const q = (url.searchParams.get("q") ?? "").trim();

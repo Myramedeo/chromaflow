@@ -1,12 +1,13 @@
 import { db } from "@/lib/db";
 import {
-  withAuth,
+  withRateLimit,
   ok,
   forbidden,
   getWorkspaceMembership,
 } from "@/lib/api-helpers";
+import { readLimiter } from "@/lib/rate-limit";
 
-export const GET = withAuth(async (_req, { userId, params }) => {
+export const GET = withRateLimit(readLimiter, async (_req, { userId, params }) => {
   const { workspaceId } = params;
   const membership = await getWorkspaceMembership(userId, workspaceId);
   if (!membership) return forbidden();

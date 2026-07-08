@@ -3,7 +3,7 @@
 
 import { db } from "@/lib/db";
 import {
-  withAuth,
+  withRateLimit,
   ok,
   created,
   error,
@@ -14,10 +14,11 @@ import {
 import { logActivity, ACTIONS } from "@/lib/activity";
 import { getWorkspaceSubscription } from "@/lib/subscription";
 import { PLAN_LIMITS, PLAN_LIMIT_ERROR } from "@/lib/plans";
+import { writeLimiter, readLimiter } from "@/lib/rate-limit";
 
 import { NextResponse } from "next/server";
 
-export const GET = withAuth(async (_req, { userId, params }) => {
+export const GET = withRateLimit(readLimiter, async (_req, { userId, params }) => {
   const { workspaceId } = params;
 
   const membership = await getWorkspaceMembership(userId, workspaceId);
@@ -44,7 +45,7 @@ interface CreateProjectBody {
   backgroundImageUrl?: string;
 }
 
-export const POST = withAuth(async (req, { userId, params }) => {
+export const POST = withRateLimit(writeLimiter, async (req, { userId, params }) => {
   const { workspaceId } = params;
 
   const membership = await getWorkspaceMembership(userId, workspaceId);

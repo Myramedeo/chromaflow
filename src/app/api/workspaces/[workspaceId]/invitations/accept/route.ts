@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { db } from "@/lib/db";
 import {
-  withAuth,
+  withRateLimit,
   ok,
   error,
   notFound,
@@ -10,12 +10,13 @@ import {
 import { hashInvitationToken } from "@/lib/invitations";
 import { syncUser } from "@/lib/sync-user";
 import { logActivity, ACTIONS } from "@/lib/activity";
+import { writeLimiter } from "@/lib/rate-limit";
 
 const acceptSchema = z.object({
   token: z.string().min(1),
 });
 
-export const POST = withAuth(async (req, { userId, params }) => {
+export const POST = withRateLimit(writeLimiter, async (req, { userId, params }) => {
   const { workspaceId } = params;
   await syncUser(userId);
 

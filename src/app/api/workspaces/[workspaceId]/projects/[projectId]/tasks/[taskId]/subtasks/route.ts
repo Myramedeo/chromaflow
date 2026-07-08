@@ -3,7 +3,7 @@
 
 import { db } from "@/lib/db";
 import {
-  withAuth,
+  withRateLimit,
   ok,
   created,
   error,
@@ -12,8 +12,9 @@ import {
   getWorkspaceMembership,
   parseBody,
 } from "@/lib/api-helpers";
+import { writeLimiter, readLimiter } from "@/lib/rate-limit";
 
-export const GET = withAuth(async (_req, { userId, params }) => {
+export const GET = withRateLimit(readLimiter, async (_req, { userId, params }) => {
   const { workspaceId, projectId, taskId } = params;
 
   const membership = await getWorkspaceMembership(userId, workspaceId);
@@ -36,7 +37,7 @@ interface CreateSubtaskBody {
   title: string;
 }
 
-export const POST = withAuth(async (req, { userId, params }) => {
+export const POST = withRateLimit(writeLimiter, async (req, { userId, params }) => {
   const { workspaceId, projectId, taskId } = params;
 
   const membership = await getWorkspaceMembership(userId, workspaceId);

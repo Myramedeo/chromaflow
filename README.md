@@ -97,7 +97,6 @@ Every push and pull request runs two parallel GitHub Actions jobs.
 
 - [ ] Public marketing landing page
 - [ ] Public-facing view options
-- [ ] Error monitoring via Sentry
 - [ ] Rate limiting on API (Upstash Redis)
 - [ ] Redis caching layer
 - [ ] End-to-end testing

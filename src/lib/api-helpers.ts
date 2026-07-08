@@ -2,6 +2,8 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import type { WorkspaceRole } from "@prisma/client";
 
+import type { Ratelimit } from "@upstash/ratelimit";
+
 import * as Sentry from "@sentry/nextjs";
  
 // ── Response helpers ──────────────────────────────────────────────────────────
@@ -100,4 +102,40 @@ export async function parseBody<T>(request: Request): Promise<T | null> {
   } catch {
     return null;
   }
+}
+
+// ── Rate limiting guard ─────────────────────────────────────────────────────
+
+type RateLimitedHandler = (
+  request: Request,
+  context: { params: Record<string, string>; userId: string }
+) => Promise<NextResponse>;
+
+export function withRateLimit(
+  limiter: Ratelimit,
+  handler: RateLimitedHandler
+) {
+  return withAuth(async (request, context) => {
+    const { userId } = context;
+
+    const { success, limit, remaining, reset } =
+      await limiter.limit(userId);  // keyed per user — not per IP
+
+    if (!success) {
+      return NextResponse.json(
+        { error: "Too many requests. Please slow down." },
+        {
+          status: 429,
+          headers: {
+            "X-RateLimit-Limit":     String(limit),
+            "X-RateLimit-Remaining": String(remaining),
+            "X-RateLimit-Reset":     String(reset),
+            "Retry-After":           String(Math.ceil((reset - Date.now()) / 1000)),
+          },
+        }
+      );
+    }
+
+    return handler(request, context);
+  });
 }

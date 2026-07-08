@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import {
-  withAuth,
+  withRateLimit,
   ok,
   error,
   forbidden,
@@ -18,8 +18,9 @@ import {
   hashInvitationToken,
 } from "@/lib/invitations";
 import { logActivity, ACTIONS } from "@/lib/activity";
+import { writeLimiter } from "@/lib/rate-limit";
 
-export const DELETE = withAuth(async (_req, { userId, params }) => {
+export const DELETE = withRateLimit(writeLimiter, async (_req, { userId, params }) => {
   const { workspaceId, invitationId } = params;
   const membership = await getWorkspaceMembership(userId, workspaceId);
   if (!membership) return forbidden();
@@ -57,7 +58,7 @@ export const DELETE = withAuth(async (_req, { userId, params }) => {
   return ok({ revoked: status === "REVOKED", status });
 });
 
-export const POST = withAuth(async (req, { userId, params }) => {
+export const POST = withRateLimit(writeLimiter, async (req, { userId, params }) => {
   const { workspaceId, invitationId } = params;
   const membership = await getWorkspaceMembership(userId, workspaceId);
   if (!membership) return forbidden();

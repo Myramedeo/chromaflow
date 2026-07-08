@@ -4,7 +4,7 @@
 
 import { db } from "@/lib/db";
 import {
-  withAuth,
+  withRateLimit,
   ok,
   error,
   forbidden,
@@ -13,6 +13,7 @@ import {
   parseBody,
 } from "@/lib/api-helpers";
 import { logActivity, ACTIONS } from "@/lib/activity";
+import { writeLimiter, readLimiter } from "@/lib/rate-limit";
 
 async function getProjectOrForbid(
   userId: string,
@@ -29,7 +30,7 @@ async function getProjectOrForbid(
   return { project, membership };
 }
 
-export const GET = withAuth(async (_req, { userId, params }) => {
+export const GET = withRateLimit(readLimiter, async (_req, { userId, params }) => {
   const { workspaceId, projectId } = params;
   const { project, membership } = await getProjectOrForbid(userId, workspaceId, projectId);
 
@@ -61,7 +62,7 @@ interface UpdateProjectBody {
   [key: string]: unknown;
 }
 
-export const PATCH = withAuth(async (req, { userId, params }) => {
+export const PATCH = withRateLimit(writeLimiter, async (req, { userId, params }) => {
   const { workspaceId, projectId } = params;
   const { project, membership } = await getProjectOrForbid(userId, workspaceId, projectId);
 
@@ -92,7 +93,7 @@ export const PATCH = withAuth(async (req, { userId, params }) => {
   return ok(updated);
 });
 
-export const DELETE = withAuth(async (_req, { userId, params }) => {
+export const DELETE = withRateLimit(writeLimiter, async (_req, { userId, params }) => {
   const { workspaceId, projectId } = params;
   const { project, membership } = await getProjectOrForbid(userId, workspaceId, projectId);
 

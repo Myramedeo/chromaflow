@@ -22,6 +22,14 @@ export function useApiFetcher() {
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
+
+        if (res.status === 429) {
+          const retryAfter = res.headers.get("Retry-After");
+          throw new Error(
+            `You're doing that too fast. Try again in ${retryAfter ?? "a moment"}.`
+          );
+        }
+
         throw new Error(err.error ?? `Request failed: ${res.status}`);
       }
       return res.json();
@@ -53,6 +61,14 @@ export function useApiMutation() {
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
+
+        if (res.status === 429) {
+          const retryAfter = res.headers.get("Retry-After");
+          throw new Error(
+            `You're doing that too fast. Try again in ${retryAfter ?? "a moment"}.`
+          );
+        }
+        
         throw new Error(err.error ?? `${method} failed: ${res.status}`);
       }
       return res.json() as Promise<T>;
