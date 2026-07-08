@@ -4,13 +4,14 @@ import PDFDocument from "pdfkit";
 import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
 import {
-  withAuth,
+  withRateLimit,
   forbidden,
   notFound,
   getWorkspaceMembership,
 } from "@/lib/api-helpers";
+import { readLimiter } from "@/lib/rate-limit";
 
-export const GET = withAuth(async (_req, { userId, params }) => {
+export const GET = withRateLimit(readLimiter, async (_req, { userId, params }) => {
   const { workspaceId, projectId } = params;
 
   const membership = await getWorkspaceMembership(userId, workspaceId);

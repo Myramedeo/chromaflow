@@ -3,7 +3,7 @@
 
 import { db } from "@/lib/db";
 import {
-  withAuth,
+  withRateLimit,
   ok,
   error,
   forbidden,
@@ -13,6 +13,7 @@ import {
 } from "@/lib/api-helpers";
 import { logActivity, ACTIONS } from "@/lib/activity";
 import { sendAssignmentNotificationEmail } from "@/lib/email";
+import { writeLimiter } from "@/lib/rate-limit";
 
 interface UpdateTaskBody {
   title?: string;
@@ -26,7 +27,7 @@ interface UpdateTaskBody {
   [key: string]: unknown;
 }
 
-export const PATCH = withAuth(async (req, { userId, params }) => {
+export const PATCH = withRateLimit(writeLimiter, async (req, { userId, params }) => {
   const { workspaceId, projectId, taskId } = params;
 
   const membership = await getWorkspaceMembership(userId, workspaceId);
@@ -115,7 +116,7 @@ export const PATCH = withAuth(async (req, { userId, params }) => {
   return ok(updated);
 });
 
-export const DELETE = withAuth(async (_req, { userId, params }) => {
+export const DELETE = withRateLimit(writeLimiter, async (_req, { userId, params }) => {
   const { workspaceId, projectId, taskId } = params;
 
   const membership = await getWorkspaceMembership(userId, workspaceId);

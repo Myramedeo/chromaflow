@@ -2,15 +2,16 @@
 
 import { db } from "@/lib/db";
 import {
-  withAuth,
+  withRateLimit,
   forbidden,
   notFound,
   getWorkspaceMembership,
 } from "@/lib/api-helpers";
 import { NextResponse } from "next/server";
+import { readLimiter } from "@/lib/rate-limit";
 import Papa from "papaparse";
 
-export const GET = withAuth(async (_req, { userId, params }) => {
+export const GET = withRateLimit(readLimiter, async (_req, { userId, params }) => {
   const { workspaceId, projectId } = params;
 
   const membership = await getWorkspaceMembership(userId, workspaceId);

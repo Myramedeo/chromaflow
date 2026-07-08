@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { db } from "@/lib/db";
 import {
-  withAuth,
+  withRateLimit,
   ok,
   error,
   forbidden,
@@ -13,6 +13,7 @@ import {
   canManageWorkspace,
 } from "@/lib/workspace-members";
 import { logActivity, ACTIONS } from "@/lib/activity";
+import { writeLimiter } from "@/lib/rate-limit";
 
 const updateRoleSchema = z.object({
   role: z.enum(["OWNER", "ADMIN", "MEMBER"]),
@@ -24,7 +25,7 @@ async function getOwnerCount(workspaceId: string) {
   });
 }
 
-export const PATCH = withAuth(async (req, { userId, params }) => {
+export const PATCH = withRateLimit(writeLimiter, async (req, { userId, params }) => {
   const { workspaceId, memberId } = params;
   const actorMembership = await getWorkspaceMembership(userId, workspaceId);
   if (!actorMembership) return forbidden();
@@ -79,7 +80,7 @@ export const PATCH = withAuth(async (req, { userId, params }) => {
   return ok(updated);
 });
 
-export const DELETE = withAuth(async (_req, { userId, params }) => {
+export const DELETE = withRateLimit(writeLimiter, async (_req, { userId, params }) => {
   const { workspaceId, memberId } = params;
   const actorMembership = await getWorkspaceMembership(userId, workspaceId);
   if (!actorMembership) return forbidden();

@@ -2,7 +2,6 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import type { WorkspaceRole } from "@prisma/client";
 
-import { readLimiter } from "@/lib/rate-limit";
 import type { Ratelimit } from "@upstash/ratelimit";
 
 import * as Sentry from "@sentry/nextjs";

@@ -4,13 +4,14 @@
 
 import { stripe } from "@/lib/stripe";
 import { db } from "@/lib/db";
-import { withAuth, ok, error, forbidden, getWorkspaceMembership, parseBody } from "@/lib/api-helpers";
+import { withRateLimit, ok, error, forbidden, getWorkspaceMembership, parseBody } from "@/lib/api-helpers";
+import { billingLimiter } from "@/lib/rate-limit";
 
 interface CheckoutBody {
   workspaceId: string;
 }
 
-export const POST = withAuth(async (req, { userId }) => {
+export const POST = withRateLimit(billingLimiter, async (req, { userId }) => {
   const body = await parseBody<CheckoutBody>(req);
   if (!body?.workspaceId) return error("workspaceId is required");
 

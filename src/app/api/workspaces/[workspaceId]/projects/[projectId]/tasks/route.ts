@@ -3,7 +3,7 @@
 
 import { db } from "@/lib/db";
 import {
-  withAuth,
+  withRateLimit,
   ok,
   created,
   error,
@@ -14,8 +14,6 @@ import {
 } from "@/lib/api-helpers";
 import { logActivity, ACTIONS } from "@/lib/activity";
 import { sendAssignmentNotificationEmail } from "@/lib/email";
-
-import { withRateLimit } from "@/lib/api-helpers";
 import { writeLimiter, readLimiter } from "@/lib/rate-limit";
 
 export const GET = withRateLimit(readLimiter, async (_req, { userId, params }) => {

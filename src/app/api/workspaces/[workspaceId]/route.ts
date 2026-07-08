@@ -4,7 +4,7 @@
 
 import { db } from "@/lib/db";
 import {
-  withAuth,
+  withRateLimit,
   ok,
   error,
   forbidden,
@@ -14,8 +14,9 @@ import {
 } from "@/lib/api-helpers";
 import { logActivity, ACTIONS } from "@/lib/activity";
 import { stripe } from "@/lib/stripe";
+import { writeLimiter, readLimiter } from "@/lib/rate-limit";
 
-export const GET = withAuth(async (_req, { userId, params }) => {
+export const GET = withRateLimit(readLimiter, async (_req, { userId, params }) => {
   const { workspaceId } = params;
 
   const membership = await getWorkspaceMembership(userId, workspaceId);
@@ -42,7 +43,7 @@ interface UpdateWorkspaceBody {
   slug?: string;
 }
 
-export const PATCH = withAuth(async (req, { userId, params }) => {
+export const PATCH = withRateLimit(writeLimiter, async (req, { userId, params }) => {
   const { workspaceId } = params;
 
   const membership = await getWorkspaceMembership(userId, workspaceId);
@@ -74,7 +75,7 @@ interface DeleteWorkspaceBody {
   confirmName: string;
 }
 
-export const DELETE = withAuth(async (req, { userId, params }) => {
+export const DELETE = withRateLimit(writeLimiter, async (req, { userId, params }) => {
   const { workspaceId } = params;
 
   const membership = await getWorkspaceMembership(userId, workspaceId);

@@ -3,7 +3,7 @@
 
 import { db } from "@/lib/db";
 import {
-  withAuth,
+  withRateLimit,
   ok,
   created,
   error,
@@ -12,8 +12,9 @@ import {
 import { logActivity, ACTIONS } from "@/lib/activity";
 import { syncUser } from "@/lib/sync-user";
 import { Prisma } from "@prisma/client";
+import { writeLimiter, readLimiter } from "@/lib/rate-limit";
 
-export const GET = withAuth(async (_req, { userId }) => {
+export const GET = withRateLimit(readLimiter, async (_req, { userId }) => {
   // Ensure user is in sync with Clerk before fetching workspaces
   await syncUser(userId);
 
@@ -42,7 +43,7 @@ interface CreateWorkspaceBody {
   slug: string;
 }
 
-export const POST = withAuth(async (req, { userId }) => {
+export const POST = withRateLimit(writeLimiter, async (req, { userId }) => {
   const body = await parseBody<CreateWorkspaceBody>(req);
 
   if (!body?.name || !body?.slug) {

@@ -3,10 +3,11 @@
 // Used by the billing settings page to render the current state.
 
 import { db } from "@/lib/db";
-import { withAuth, ok, forbidden, getWorkspaceMembership } from "@/lib/api-helpers";
+import { withRateLimit, ok, forbidden, getWorkspaceMembership } from "@/lib/api-helpers";
 import { getWorkspaceSubscription } from "@/lib/subscription";
+import { readLimiter } from "@/lib/rate-limit";
 
-export const GET = withAuth(async (_req, { userId, params }) => {
+export const GET = withRateLimit(readLimiter, async (_req, { userId, params }) => {
   const { workspaceId } = params;
 
   const membership = await getWorkspaceMembership(userId, workspaceId);

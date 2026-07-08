@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { db } from "@/lib/db";
 import {
-  withAuth,
+  withRateLimit,
   ok,
   created,
   error,
@@ -21,13 +21,14 @@ import {
   hashInvitationToken,
 } from "@/lib/invitations";
 import { logActivity, ACTIONS } from "@/lib/activity";
+import { writeLimiter, readLimiter } from "@/lib/rate-limit";
 
 const invitationSchema = z.object({
   email: z.string().email(),
   role: z.enum(["ADMIN", "MEMBER"]).default("MEMBER"),
 });
 
-export const GET = withAuth(async (_req, { userId, params }) => {
+export const GET = withRateLimit(readLimiter, async (_req, { userId, params }) => {
   const { workspaceId } = params;
   const membership = await getWorkspaceMembership(userId, workspaceId);
   if (!membership) return forbidden();
@@ -52,7 +53,7 @@ export const GET = withAuth(async (_req, { userId, params }) => {
   return ok(invitations);
 });
 
-export const POST = withAuth(async (req, { userId, params }) => {
+export const POST = withRateLimit(writeLimiter, async (req, { userId, params }) => {
   const { workspaceId } = params;
   const membership = await getWorkspaceMembership(userId, workspaceId);
   if (!membership) return forbidden();
