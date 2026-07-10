@@ -21,5 +21,11 @@ export default defineConfig({
     url: 'http://127.0.0.1:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
+    env: {
+      NEXT_PUBLIC_E2E_AUTH_BYPASS: 'true',
+      NEXT_PUBLIC_E2E_USER_ID: 'e2e-user',
+      NEXT_PUBLIC_E2E_USER_EMAIL: 'e2e@example.com',
+      NEXT_PUBLIC_E2E_USER_NAME: 'E2E User',
+    },
   },
 });

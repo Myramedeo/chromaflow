@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import type { WorkspaceRole } from "@prisma/client";
+import { getE2eAuthUser, isE2eAuthBypassEnabled } from "@/lib/e2e-auth";
 
 import type { Ratelimit } from "@upstash/ratelimit";
 
@@ -57,6 +58,13 @@ export function withAuth(handler: AuthedHandler) {
     request: Request,
     context: { params: Promise<Record<string, string>> }
   ): Promise<NextResponse> => {
+    if (isE2eAuthBypassEnabled()) {
+      const { userId } = getE2eAuthUser();
+      Sentry.setUser({ id: userId });
+      const params = await context.params;
+      return handler(request, { params, userId });
+    }
+
     const { userId } = await auth();
  
     if (!userId) {
