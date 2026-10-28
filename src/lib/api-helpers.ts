@@ -2,7 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import type { WorkspaceRole } from "@prisma/client";
 
-import type { Ratelimit } from "@upstash/ratelimit";
+import { createRateLimiter } from "@/lib/rate-limit";
 
 import * as Sentry from "@sentry/nextjs";
  
@@ -111,15 +111,18 @@ type RateLimitedHandler = (
   context: { params: Record<string, string>; userId: string }
 ) => Promise<NextResponse>;
 
+type RateLimiter = ReturnType<typeof createRateLimiter>;
+
 export function withRateLimit(
-  limiter: Ratelimit,
+  limiter: RateLimiter,
   handler: RateLimitedHandler
 ) {
   return withAuth(async (request, context) => {
     const { userId } = context;
 
-    const { success, limit, remaining, reset } =
-      await limiter.limit(userId);  // keyed per user — not per IP
+    // In-memory limiter: synchronous, no await.
+    const { success, limit, remaining, resetAt } =
+      limiter(userId);
 
     if (!success) {
       return NextResponse.json(
@@ -129,8 +132,8 @@ export function withRateLimit(
           headers: {
             "X-RateLimit-Limit":     String(limit),
             "X-RateLimit-Remaining": String(remaining),
-            "X-RateLimit-Reset":     String(reset),
-            "Retry-After":           String(Math.ceil((reset - Date.now()) / 1000)),
+            "X-RateLimit-Reset":     String(Math.ceil(resetAt / 1000)),
+            "Retry-After":           String(Math.max(1, Math.ceil((resetAt - Date.now()) / 1000))),
           },
         }
       );
