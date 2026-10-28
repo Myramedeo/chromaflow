@@ -1,23 +1,77 @@
-import { Ratelimit } from "@upstash/ratelimit";
-import { redis } from "@/lib/redis";
+type RateLimitEntry = {
+  count: number;
+  resetAt: number;
+};
 
-// General API reads - generous limit
-export const readLimiter = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(60, "1 m"),  // 60 req/min
-  prefix: "rl:read",
-});
+type RateLimitResult = {
+  success: boolean;
+  limit: number;
+  remaining: number;
+  resetAt: number;
+};
 
-// Write operations (create task, move task, create project)
-export const writeLimiter = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(30, "1 m"),  // 30 req/min
-  prefix: "rl:write",
-});
+export function createRateLimiter(
+  limit: number,
+  windowMs: number
+) {
+  const requests = new Map<string, RateLimitEntry>();
 
-// Billing endpoints - very tight, no abuse
-export const billingLimiter = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(5, "1 m"),   // 5 req/min
-  prefix: "rl:billing",
-});
+  return function checkRateLimit(
+    key: string
+  ): RateLimitResult {
+    const now = Date.now();
+    const entry = requests.get(key);
+
+    if (!entry || now >= entry.resetAt) {
+      const resetAt = now + windowMs;
+
+      requests.set(key, {
+        count: 1,
+        resetAt,
+      });
+
+      return {
+        success: true,
+        limit,
+        remaining: limit - 1,
+        resetAt,
+      };
+    }
+
+    if (entry.count >= limit) {
+      return {
+        success: false,
+        limit,
+        remaining: 0,
+        resetAt: entry.resetAt,
+      };
+    }
+
+    entry.count++;
+
+    return {
+      success: true,
+      limit,
+      remaining: limit - entry.count,
+      resetAt: entry.resetAt,
+    };
+  };
+}
+
+// General API reads: 60 requests/minute
+export const readLimiter = createRateLimiter(
+  60,
+  60_000
+);
+
+// Write operations: 30 requests/minute
+export const writeLimiter = createRateLimiter(
+  30,
+  60_000
+);
+
+// Billing endpoints: 5 requests/minute
+export const billingLimiter = createRateLimiter(
+  5,
+  60_000
+);

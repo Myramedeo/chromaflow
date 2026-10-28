@@ -51,7 +51,13 @@ export function CreateWorkspaceModal({ children }: { children: React.ReactNode }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger>{children}</DialogTrigger>
+      <DialogTrigger
+        render={
+          <Button className="gap-1.5" type="button">
+            {children}
+          </Button>
+        }
+      />
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>New workspace</DialogTitle>
