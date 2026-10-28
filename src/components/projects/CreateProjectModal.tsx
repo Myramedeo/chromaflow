@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { PLAN_LIMIT_ERROR } from "@/lib/plans";
-import { Zap } from "lucide-react";
+import { Plus, Zap } from "lucide-react";
 
 const COLOR_OPTIONS = [
   "#6366f1", "#8b5cf6", "#ec4899",
@@ -87,7 +87,12 @@ export function CreateProjectModal({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger>{children}</DialogTrigger>
+      <DialogTrigger
+        render={<Button size="sm" className="gap-1.5" type="button" />}
+      >
+        <Plus className="size-4" />
+        New project
+      </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{limitHit ? "Upgrade to Pro" : "New project"}</DialogTitle>

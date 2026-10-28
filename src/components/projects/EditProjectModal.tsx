@@ -66,14 +66,18 @@ export function EditProjectModal({
       setOpen(isOpen);
       if (!isOpen) reset();
     }}>
-      <DialogTrigger>
-        {trigger ?? (
+      <DialogTrigger
+        render={
           <Button variant="ghost" size="sm" className="gap-1.5">
-            <Pencil className="h-3.5 w-3.5 text-gray-900 dark:text-white" />
-            Edit
+            {trigger ?? (
+              <>
+                <Pencil className="h-3.5 w-3.5 text-gray-900 dark:text-white" />
+                Edit
+              </>
+            )}
           </Button>
-        )}
-      </DialogTrigger>
+        }
+      />
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Edit project</DialogTitle>
