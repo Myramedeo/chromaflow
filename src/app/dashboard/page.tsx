@@ -39,10 +39,8 @@ export default function DashboardPage() {
         <p className="mt-1 text-sm text-gray-500">Create your first workspace to get started.</p>
       </div>
       <CreateWorkspaceModal>
-        <Button className="gap-1.5">
-          <Plus className="h-4 w-4" />
-          Create workspace
-        </Button>
+        <Plus className="h-4 w-4" />
+        Create workspace
       </CreateWorkspaceModal>
     </div>
   );

@@ -59,5 +59,12 @@
     "prisma": "^7.8.0",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "allowScripts": {
+    "@clerk/shared@4.13.1": true,
+    "@prisma/engines@7.10.1": true,
+    "@sentry/cli@2.58.6": true,
+    "prisma@7.10.1": true,
+    "unrs-resolver@1.11.1": true
   }
 }
